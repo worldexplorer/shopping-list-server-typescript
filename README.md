@@ -13,4 +13,8 @@ https://www.npmjs.com/package/ts-node#watching-and-restarting
 
 
 https://khalilstemmler.com/blogs/typescript/node-starter-project/
+
 https://www.digitalocean.com/community/tutorials/setting-up-a-node-project-with-typescript
+
+ws://localhost:5000
+ws://192.168.43.135:5000
