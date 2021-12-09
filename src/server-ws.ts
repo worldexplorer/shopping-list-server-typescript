@@ -1,9 +1,9 @@
 import * as express from 'express';
 import * as http from 'http';
 import * as WebSocket from 'ws';
-import * as constants from './server-const';
+import { runConfig, URL } from './server.config';
 
-export function create(app: any, httpServer: http.Server) {
+export function create(httpServer: http.Server) {
   const wsServer = new WebSocket.Server({ server: httpServer });
 
   wsServer.on('connection', (socket: WebSocket) => {
@@ -31,13 +31,12 @@ export function create(app: any, httpServer: http.Server) {
       console.log('Address in use, retrying...');
       setTimeout(() => {
         httpServer.close();
-        httpServer.listen(constants.PORT, constants.HOST);
+        httpServer.listen(runConfig.PORT, runConfig.HOST);
       }, 1000);
     }
   });
 
-  httpServer.listen(constants.PORT, constants.HOST, () => {
-    console.log(`WsServer is listening on ${constants.URL}`);
-    app.set(constants.keyPort, constants.PORT);
+  httpServer.listen(runConfig.PORT, runConfig.HOST, () => {
+    console.log(`WsServer is listening on ${URL}`);
   });
 }

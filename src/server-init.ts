@@ -1,24 +1,23 @@
 import * as express from 'express';
 import * as http from 'http';
-import * as constants from './server-const';
+import { config, runConfig } from './server.config';
 
 const app = express();
 const httpServer: http.Server = http.createServer(app);
 
 app.get('/', (req, res) => {
-  const currentPort = parseInt(app.get(constants.keyPort));
   const content = {
-    [constants.keyPort]: currentPort,
+    [config.keyPort]: runConfig.PORT,
   };
-  if (currentPort === constants.devPort) {
-    res.jsonp(content);
-  } else {
+  if (config.printEnv) {
     res.json({ ...content, ENV: process.env });
+  } else {
+    res.jsonp(content);
   }
 });
 
-// import * as ioServer from './server-io';
-// ioServer.create(app, httpServer);
+import * as ioServer from './server-io';
+ioServer.create(httpServer);
 
-import * as wsServer from './server-ws';
-wsServer.create(app, httpServer);
+// import * as wsServer from './server-ws';
+// wsServer.create(httpServer);
