@@ -6,9 +6,9 @@ const app = express();
 const httpServer = http.createServer(app);
 const wsServer = new WebSocket.Server({ server: httpServer });
 
-const server_port = 5000;
+const PORT: number = process.env.PORT ? parseInt(process.env.PORT) : 5000;
 // const server_ip: string = '192.168.43.135';
-const server_ip: string = '0.0.0.0';
+const HOST: string = '0.0.0.0';
 
 wsServer.on('connection', (socket: WebSocket) => {
   console.log(`client connected length=${socket.listeners.length}`);
@@ -35,13 +35,13 @@ httpServer.on('error', (e: Error) => {
     console.log('Address in use, retrying...');
     setTimeout(() => {
       httpServer.close();
-      httpServer.listen(server_port);
+      httpServer.listen(PORT);
       //   httpServer.listen(server_port, server_ip);
     }, 1000);
   }
 });
 
 // httpServer.listen(server_port, () => {
-httpServer.listen(server_port, server_ip, () => {
+httpServer.listen(PORT, HOST, () => {
   console.log(`Server started`, httpServer.address());
 });
