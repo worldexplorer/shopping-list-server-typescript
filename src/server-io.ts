@@ -36,11 +36,12 @@ wsServer.on('connection', function (socket) {
   });
 });
 
-const server_port = 5000;
-const server_ip: string = '192.168.43.135';
-//server.listen(server_port, "192.168.43.135", function (err) {
-// server.listen(server_port, "10.0.2.2", function (err) {
-httpServer.listen(server_port, server_ip, () => {
+// heroku provides dynamic ports
+const PORT: number = process.env.PORT ? parseInt(process.env.PORT) : 5000;
+// heroku crashes on IPv6 binding
+const HOST: string = '0.0.0.0'; // '192.168.43.135'
+
+httpServer.listen(PORT, HOST, () => {
   // if (err) throw err;
-  console.log('Listening on port %d', server_port);
+  console.log(`Socket.IO is listening on http://${HOST}:${PORT}`);
 });
