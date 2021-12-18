@@ -15,24 +15,24 @@ type Rooms = {
   rooms: Room[];
 };
 
-const mockUserBob: User = {
+export const mockUserBob: User = {
   id: 1,
   name: 'Bob',
   email: 'first@user',
   phone: '+1-555-5555',
 };
 
-const mockUserAlice: User = {
+export const mockUserAlice: User = {
   id: 2,
   name: 'Alice',
   email: 'second@user',
   phone: '+1-555-6666',
 };
 
-const mockRoom: Room = {
+export const mockRoom: Room = {
   id: 1,
   name: 'Our MOCK chat',
   users: [mockUserBob, mockUserAlice],
 };
 
-const mockRooms: Rooms = { rooms: [mockRoom] };
+export const mockRooms: Rooms = { rooms: [mockRoom] };

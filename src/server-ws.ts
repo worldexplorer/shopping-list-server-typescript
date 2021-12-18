@@ -2,18 +2,13 @@ import * as express from 'express';
 import * as http from 'http';
 import * as WebSocket from 'ws';
 import { runConfig, URL } from './server.config';
+import { mockUserBob, mockRooms } from './mock';
 
 export function create(httpServer: http.Server) {
   const wsServer = new WebSocket.Server({ server: httpServer });
 
   wsServer.on('connection', (socket: WebSocket) => {
     console.log(`client connected length=${socket.listeners.length}`);
-
-    console.log('emitting USER', mockRooms);
-    socket.emit('user', JSON.stringify(mockUserBob));
-
-    console.log('emitting ROOMS', mockRooms);
-    socket.emit('rooms', JSON.stringify(mockRooms));
 
     socket.on('typing', data => {
       console.log('received TYPING', data);

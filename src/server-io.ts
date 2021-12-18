@@ -1,39 +1,45 @@
-import * as express from 'express';
 import * as http from 'http';
 import * as socketio from 'socket.io';
 import { runConfig, URL } from './server.config';
+import { mockUserBob, mockRooms } from './mock';
 
 export function create(httpServer: http.Server) {
   const ioServer = new socketio.Server(httpServer);
 
-  ioServer.on('connect', client => {
-    console.log('client connect...', client.id);
+  ioServer.on('connect', socket => {
+    console.log('client connect...', socket.id);
 
-    client.on('typing', (data: any) => {
+    socket.on('typing', (data: any) => {
+      // console.log('> TYPING', data);
       ioServer.emit('typing', data);
     });
 
-    client.on('message', (data: any) => {
-      console.log(data);
+    socket.on('login', (data: any) => {
+      console.log('> LOGIN', data);
+
+      console.log('   << USER', mockUserBob);
+      socket.emit('user', mockUserBob);
+
+      console.log('   << ROOMS', mockRooms);
+      socket.emit('rooms', mockRooms);
+    });
+
+    socket.on('message', (data: any) => {
+      console.log('> MESSAGE', data);
       ioServer.emit('message', data);
     });
 
-    client.on('location', (data: any) => {
-      console.log(data);
-      ioServer.emit('location', data);
-    });
-
-    client.on('connect', () => {
+    socket.on('connect', () => {
       console.log('<who?> connected', ioServer.sockets.name);
     });
 
-    client.on('disconnect', () => {
-      console.log('client disconnect...', client.id);
+    socket.on('disconnect', () => {
+      console.log('client disconnect...', socket.id);
       // handleDisconnect()
     });
 
-    client.on('error', (err: any) => {
-      console.log('received error from client:', client.id);
+    socket.on('error', (err: any) => {
+      console.log('received error from client:', socket.id);
       console.log(err);
     });
   });
