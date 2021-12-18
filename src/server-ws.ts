@@ -9,8 +9,25 @@ export function create(httpServer: http.Server) {
   wsServer.on('connection', (socket: WebSocket) => {
     console.log(`client connected length=${socket.listeners.length}`);
 
+    console.log('emitting USER', mockRooms);
+    socket.emit('user', JSON.stringify(mockUserBob));
+
+    console.log('emitting ROOMS', mockRooms);
+    socket.emit('rooms', JSON.stringify(mockRooms));
+
     socket.on('typing', data => {
+      console.log('received TYPING', data);
       wsServer.emit('typing', data);
+    });
+
+    socket.on('login', data => {
+      console.log('received LOGIN', data);
+
+      console.log('emitting USER', mockRooms);
+      socket.emit('user', JSON.stringify(mockUserBob));
+
+      console.log('emitting ROOMS', mockRooms);
+      socket.emit('rooms', JSON.stringify(mockRooms));
     });
 
     socket.on('message', data => {
