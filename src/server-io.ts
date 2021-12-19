@@ -1,7 +1,7 @@
 import * as http from 'http';
 import * as socketio from 'socket.io';
 import { runConfig, URL } from './server.config';
-import { mockUserBob, mockRooms } from './mock';
+import { mockUserBob, mockRooms, GetMessages, mockMessages } from './mock';
 
 export function create(httpServer: http.Server) {
   const ioServer = new socketio.Server(httpServer);
@@ -27,6 +27,12 @@ export function create(httpServer: http.Server) {
     socket.on('message', (data: any) => {
       console.log('> MESSAGE', data);
       ioServer.emit('message', data);
+    });
+
+    socket.on('getMessages', (data: GetMessages) => {
+      console.log('> MESSAGES', data);
+      console.log('   << MESSAGES', mockMessages);
+      socket.emit('messages', mockMessages);
     });
 
     socket.on('connect', () => {
