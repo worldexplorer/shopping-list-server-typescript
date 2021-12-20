@@ -1,15 +1,18 @@
 import * as express from 'express';
 import * as http from 'http';
 import { config, runConfig } from './server.config';
-// import * as pg from './pg/hello';
+
+import { selectPublicTables } from './pg/hello';
+import { QueryResultRow } from 'pg';
 
 const app = express();
 const httpServer: http.Server = http.createServer(app);
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
+  const publicTables = await selectPublicTables();
   const content = {
     [config.keyPort]: runConfig.PORT,
-    //PG: pg.sample_query(),
+    publicTables,
   };
   if (config.printEnv) {
     res.json({ ...content, ENV: process.env });
@@ -20,6 +23,3 @@ app.get('/', (req, res) => {
 
 import * as ioServer from './server-io';
 ioServer.create(httpServer);
-
-// import * as wsServer from './server-ws';
-// wsServer.create(httpServer);

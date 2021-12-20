@@ -1,7 +1,8 @@
 import * as http from 'http';
 import * as socketio from 'socket.io';
 import { runConfig, URL } from './server.config';
-import { mockUserBob, mockRooms, GetMessages, mockMessages } from './mock';
+import { GetMessages, Login, Message } from './common/dto';
+import { mockUserBob, mockRooms, mockMessages } from './mock';
 
 export function create(httpServer: http.Server) {
   const ioServer = new socketio.Server(httpServer);
@@ -14,7 +15,7 @@ export function create(httpServer: http.Server) {
       ioServer.emit('typing', data);
     });
 
-    socket.on('login', (data: any) => {
+    socket.on('login', (data: Login) => {
       console.log('> LOGIN', data);
 
       console.log('   << USER', mockUserBob);
@@ -24,7 +25,7 @@ export function create(httpServer: http.Server) {
       socket.emit('rooms', mockRooms);
     });
 
-    socket.on('message', (data: any) => {
+    socket.on('message', (data: Message) => {
       console.log('> MESSAGE', data);
       ioServer.emit('message', data);
     });
