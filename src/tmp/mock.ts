@@ -1,28 +1,30 @@
-import { User, Room, Rooms, Messages } from "./common/dto";
+import { MessagesDto } from '../common/message';
+import { RoomDto, RoomsDto } from '../common/room';
+import { UserDto } from '../entity/user';
 
-export const mockUserBob: User = {
+export const mockUserBob: UserDto = {
   id: 1,
   name: 'Bob',
   email: 'first@user',
   phone: '+1-555-5555',
 };
 
-export const mockUserAlice: User = {
+export const mockUserAlice: UserDto = {
   id: 2,
   name: 'Alice',
   email: 'second@user',
   phone: '+1-555-6666',
 };
 
-export const mockRoom: Room = {
+export const mockRoom: RoomDto = {
   id: 1,
   name: 'Our MOCK chat',
   users: [mockUserBob, mockUserAlice],
 };
 
-export const mockRooms: Rooms = { rooms: [mockRoom] };
+export const mockRooms: RoomsDto = { rooms: [mockRoom] };
 
-export const mockMessages: Messages = {
+export const mockMessages: MessagesDto = {
   room: 1,
   messages: [
     {

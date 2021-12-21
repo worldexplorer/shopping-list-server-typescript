@@ -1,8 +1,10 @@
 import * as http from 'http';
 import * as socketio from 'socket.io';
+import { LoginDto } from './common/dto';
+import { MessageDto, GetMessagesDto } from './common/message';
+import { login } from './incoming/login';
 import { runConfig, URL } from './server.config';
-import { GetMessages, Login, Message } from './common/dto';
-import { mockUserBob, mockRooms, mockMessages } from './mock';
+import { mockUserBob, mockRooms, mockMessages } from './tmp/mock';
 
 export function create(httpServer: http.Server) {
   const ioServer = new socketio.Server(httpServer);
@@ -15,22 +17,23 @@ export function create(httpServer: http.Server) {
       ioServer.emit('typing', data);
     });
 
-    socket.on('login', (data: Login) => {
+    socket.on('login', async (data: LoginDto) => {
       console.log('> LOGIN', data);
 
-      console.log('   << USER', mockUserBob);
-      socket.emit('user', mockUserBob);
+      const user = await login(data.phone);
+      console.log('   << USER', user);
+      socket.emit('user', user);
 
       console.log('   << ROOMS', mockRooms);
       socket.emit('rooms', mockRooms);
     });
 
-    socket.on('message', (data: Message) => {
+    socket.on('message', (data: MessageDto) => {
       console.log('> MESSAGE', data);
       ioServer.emit('message', data);
     });
 
-    socket.on('getMessages', (data: GetMessages) => {
+    socket.on('getMessages', (data: GetMessagesDto) => {
       console.log('> MESSAGES', data);
       console.log('   << MESSAGES', mockMessages);
       socket.emit('messages', mockMessages);

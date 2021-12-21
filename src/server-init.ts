@@ -1,8 +1,11 @@
 import * as express from 'express';
 import * as http from 'http';
+
+import 'reflect-metadata';
+
 import { config, runConfig } from './server.config';
 
-import { selectPublicTables } from './pg/hello';
+import { selectPublicTables } from './tmp/hello';
 import { QueryResultRow } from 'pg';
 
 const app = express();
