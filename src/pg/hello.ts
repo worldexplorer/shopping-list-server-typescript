@@ -1,4 +1,4 @@
-import { select } from '../pg/pg-lib';
+import { select } from './pg-lib';
 
 export async function selectPublicTables(): Promise<string[]> {
   const query = `

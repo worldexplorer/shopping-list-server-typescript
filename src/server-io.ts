@@ -1,31 +1,44 @@
 import * as http from 'http';
 import * as socketio from 'socket.io';
-import { LoginDto } from './common/dto';
-import { MessageDto, GetMessagesDto } from './common/message';
-import { login } from './incoming/login';
 import { runConfig, URL } from './server.config';
-import { mockUserBob, mockRooms, mockMessages } from './tmp/mock';
+
+import { PrismaInit } from './prisma-instance';
+
+import { MessageDto, GetMessagesDto } from './common/messageDto';
+import { login } from './incoming/login';
+import { LoginDto } from './common/userDto';
+
+import { mockRooms, mockMessages } from './common/mock';
+import { rooms } from './outgoing/rooms';
 
 export function create(httpServer: http.Server) {
   const ioServer = new socketio.Server(httpServer);
 
   ioServer.on('connect', socket => {
-    console.log('client connect...', socket.id);
+    console.log('Socket.IO client connected', socket.id);
 
     socket.on('typing', (data: any) => {
       // console.log('> TYPING', data);
       ioServer.emit('typing', data);
     });
 
-    socket.on('login', async (data: LoginDto) => {
-      console.log('> LOGIN', data);
+    socket.on('login', async (json: LoginDto) => {
+      try {
+        console.log('> LOGIN', json);
 
-      const user = await login(data.phone);
-      console.log('   << USER', user);
-      socket.emit('user', user);
+        const userDto = await login(json.phone);
+        console.log('   << USER', userDto);
+        socket.emit('user', userDto);
 
-      console.log('   << ROOMS', mockRooms);
-      socket.emit('rooms', mockRooms);
+        const roomsDto = await rooms(userDto.id);
+        roomsDto.rooms[0].users.push(userDto);
+
+        console.log('   << ROOMS', JSON.stringify(roomsDto));
+        socket.emit('rooms', roomsDto);
+      } catch (e) {
+        console.log('   << ERROR', e);
+        socket.emit('error', e);
+      }
     });
 
     socket.on('message', (data: MessageDto) => {
@@ -44,18 +57,19 @@ export function create(httpServer: http.Server) {
     });
 
     socket.on('disconnect', () => {
-      console.log('client disconnect...', socket.id);
+      console.log('Socket.IO client disconnect...', socket.id);
       // handleDisconnect()
     });
 
     socket.on('error', (err: any) => {
-      console.log('received error from client:', socket.id);
+      console.log('received error from Socket.IO client:', socket.id);
       console.log(err);
     });
   });
 
-  httpServer.listen(runConfig.PORT, runConfig.HOST, () => {
-    // if (err) throw err;
+  httpServer.listen(runConfig.PORT, runConfig.HOST, async () => {
+    //if (err) throw err;
     console.log(`Socket.IO is listening on ${URL}`);
+    await PrismaInit();
   });
 }

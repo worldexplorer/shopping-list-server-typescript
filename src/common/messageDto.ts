@@ -1,4 +1,4 @@
-import { PurchaseDto } from './purchase';
+import { PurchaseDto } from './purchaseDto';
 
 export type MessageDto = {
   id: number;

@@ -5,7 +5,7 @@ import 'reflect-metadata';
 
 import { config, runConfig } from './server.config';
 
-import { selectPublicTables } from './tmp/hello';
+import { selectPublicTables } from './pg/hello';
 import { QueryResultRow } from 'pg';
 
 const app = express();

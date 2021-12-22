@@ -1,4 +1,4 @@
-import { UserDto } from '../entity/user';
+import { UserDto } from './userDto';
 
 export type RoomDto = {
   id: number;
