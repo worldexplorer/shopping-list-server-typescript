@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start:dev": "export DATABASE_URL=postgres://shli:shli@localhost:5432/shli ; nodemon",
+    "start:dev": "export DATABASE_URL=postgres://shli:shli@localhost:5432/shli?schema=public&connection_limit=5 ; nodemon",
     "clean": "rimraf ./dist",
     "build": "npm run clean && ./node_modules/.bin/tsc",
     "start": "node dist/server/server-init.js",

@@ -2,6 +2,7 @@ export const config = {
   keyPort: 'WEBSOCKET_PORT', //HEROKU_DYNAMIC_
   devPort: 5000,
   printEnv: false,
+  debugPrismaQuery: false,
 };
 
 export const runConfig = {

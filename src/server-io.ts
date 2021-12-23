@@ -31,8 +31,6 @@ export function create(httpServer: http.Server) {
         socket.emit('user', userDto);
 
         const roomsDto = await rooms(userDto.id);
-        roomsDto.rooms[0].users.push(userDto);
-
         console.log('   << ROOMS', JSON.stringify(roomsDto));
         socket.emit('rooms', roomsDto);
       } catch (e) {

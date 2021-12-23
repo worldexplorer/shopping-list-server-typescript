@@ -330,16 +330,18 @@ model shli_constant {
 // }
 
 model shli_m2m_room_person {
-  id             Int       @id @default(autoincrement())
-  date_updated   DateTime? @default(now()) @db.Timestamp(6)
-  date_created   DateTime? @default(now()) @db.Timestamp(6)
-  date_published DateTime? @db.Timestamp(6)
-  published      Int       @default(1) @db.SmallInt
-  deleted        Int       @default(0) @db.SmallInt
-  manorder       Int       @default(autoincrement())
-  ident          String?   @default("") @db.VarChar(250)
-  room           Int       @default(0)
-  person         Int       @default(0)
+  id             Int          @id @default(autoincrement())
+  date_updated   DateTime?    @default(now()) @db.Timestamp(6)
+  date_created   DateTime?    @default(now()) @db.Timestamp(6)
+  date_published DateTime?    @db.Timestamp(6)
+  published      Int          @default(1) @db.SmallInt
+  deleted        Int          @default(0) @db.SmallInt
+  manorder       Int          @default(autoincrement())
+  ident          String?      @default("") @db.VarChar(250)
+  room           Int          @default(0)
+  person         Int          @default(0)
+  Person         shli_person  @relation(fields: [person], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Room           shli_room    @relation(fields: [room], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model shli_message {
@@ -378,6 +380,7 @@ model shli_person {
   date_lastclick      DateTime?       @db.Timestamp(6)
   lastip              String          @default("") @db.VarChar(250)
   lastsid             String          @default("") @db.VarChar(250)
+  m2m_room_person     shli_m2m_room_person[]
   Messages            shli_message[]
   Purchases_created   shli_purchase[] @relation("shli_personToshli_purchase_person_created")
   Purchase_purchased  shli_purchase[] @relation("shli_personToshli_purchase_person_purchased")
@@ -515,6 +518,7 @@ model shli_room {
   message_pinned        Int             @default(0)
   message_pinned_text   String?
   Person_created        shli_person     @relation(fields: [person_created], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  m2m_room_person       shli_m2m_room_person[]
   Messages              shli_message[]
   Pgroups               shli_pgroup[]
   Products              shli_product[]
