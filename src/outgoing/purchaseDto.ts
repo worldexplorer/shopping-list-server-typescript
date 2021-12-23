@@ -5,8 +5,8 @@ export type PurchaseDto = {
 
   name: string;
 
+  message: number;
   room: number;
-  user: number;
 
   show_pgroup: number;
   show_price: number;
@@ -15,9 +15,9 @@ export type PurchaseDto = {
 
   person_created: number;
   person_created_name: string;
-  person_purchased: number;
-  person_purchased_name: string;
+  person_purchased?: number;
+  person_purchased_name?: string;
 
-  price_total: number;
-  weight_total: number;
+  price_total?: number;
+  weight_total?: number;
 };

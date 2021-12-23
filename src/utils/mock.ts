@@ -1,6 +1,6 @@
-import { MessagesDto } from './messageDto';
-import { RoomDto, RoomsDto } from './roomDto';
-import { UserDto } from './userDto';
+import { RoomDto, RoomsDto } from '../outgoing/roomsDto';
+import { UserDto } from '../incoming/loginDto';
+import { MessagesDto } from '../outgoing/messageDto';
 
 export const mockUserBob: UserDto = {
   id: 1,

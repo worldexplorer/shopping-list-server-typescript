@@ -1,26 +1,13 @@
-import { RoomsDto, RoomDto } from '../common/roomDto';
-import { UserDto } from '../common/userDto';
+import { RoomsDto, RoomDto } from './roomsDto';
+import { UserDto } from '../incoming/loginDto';
 import { prI } from '../prisma-instance';
 
 export async function rooms(userId: number): Promise<RoomsDto> {
-  //v2
-  const result = await prI.$queryRaw`
-SELECT room.id, room.ident 
-  , string_agg(DISTINCT CONCAT(person.id, '=', person.ident, ';', person.phone, ';', person.email), '~~') AS room_users
-FROM shli_m2m_room_person m2m
-  INNER JOIN shli_room room ON m2m.room=room.id
-  INNER JOIN shli_m2m_room_person m2m_room_users ON m2m_room_users.room=room.id
-  INNER JOIN shli_person person ON person.id=m2m_room_users.person
-WHERE m2m.person=${userId}
-GROUP BY room.id, room.ident      -- , room_users
-`;
-  console.log(`         v2 result`, JSON.stringify(result));
-
   const cond = { person: userId };
   const roomsForPerson = await prI.shli_m2m_room_person.findMany({
     where: cond,
     select: {
-      Room: true,
+      shli_room: true,
     },
   });
   if (!roomsForPerson.length) {
@@ -30,8 +17,8 @@ GROUP BY room.id, room.ident      -- , room_users
   const roomsWithoutUsers: RoomDto[] = roomsForPerson.map(
     row =>
       <RoomDto>{
-        id: row.Room.id,
-        name: row.Room.ident,
+        id: row.shli_room.id,
+        name: row.shli_room.ident,
         users: [], //x.Rooms.map(room => room.)
       }
   );
@@ -44,7 +31,7 @@ GROUP BY room.id, room.ident      -- , room_users
     where: cond2,
     select: {
       room: true,
-      Person: true,
+      shli_person: true,
     },
   });
 
@@ -56,22 +43,23 @@ GROUP BY room.id, room.ident      -- , room_users
     const [rmId, personsInRooms] = tuple;
     const room = roomById.get(rmId);
     if (room) {
-      const usersInRoom: UserDto[] = personsInRooms.map(
-        x =>
-          <UserDto>{
-            id: x.Person.id,
-            name: x.Person.ident,
-            phone: x.Person.phone,
-            email: x.Person.email,
-          }
-      );
+      const usersInRoom: UserDto[] = personsInRooms.map(x => {
+        const ret: UserDto = {
+          id: x.shli_person.id,
+          name: x.shli_person.ident,
+          phone: x.shli_person.phone,
+          email: x.shli_person.email,
+        };
+        return ret;
+      });
       usersInRoom.forEach(x => room.users.push(x));
     }
   }
   // console.log(`roomById`, roomById);
 
   const roomsWithUsersDeduplicated: RoomDto[] = Array.from(roomById.values());
-  return <RoomsDto>{ rooms: roomsWithUsersDeduplicated };
+  const ret: RoomsDto = { rooms: roomsWithUsersDeduplicated };
+  return ret;
 }
 
 // https://inprod.dev/blog/2020-04-06-groupby-helper/
@@ -88,3 +76,39 @@ export function GroupBy<T, K extends keyof T>(array: T[], key: K) {
   });
   return map;
 }
+
+//v2
+// type RightJoined = {
+//   id: number;
+//   ident: string;
+//   roomUsers: string;
+// };
+// export async function rooms(userId: number): Promise<RoomsDto> {
+//   const result = await prI.$queryRaw<RightJoined[]>`
+// SELECT room.id, room.ident
+//   , string_agg(DISTINCT CONCAT(person.id, '=', person.ident, '~*/', person.phone, '~*/', person.email), '~~') AS room_users
+// FROM shli_m2m_room_person m2m
+//   INNER JOIN shli_room room ON m2m.room=room.id
+//   INNER JOIN shli_m2m_room_person m2m_room_users ON m2m_room_users.room=room.id
+//   INNER JOIN shli_person person ON person.id=m2m_room_users.person
+// WHERE m2m.person=${userId}
+// GROUP BY room.id, room.ident      -- , room_users
+// `;
+//   console.log(`         v2 result`, JSON.stringify(result));
+//   const ret: RoomDto[] = [];
+//   for (var row of result) {
+//     const usersDto = splitRoomUsers(row.roomUsers);
+//     ret.push({ id: row.id, name: row.ident, users: usersDto });
+//   }
+//   return { rooms: ret } as RoomsDto;
+// }
+// function splitRoomUsers(roomUsers: string): UserDto[] {
+//   const ret: UserDto[] = [];
+//   if (!roomUsers.length) {
+//     return ret;
+//   }
+//   const re = RegExp('/(\d)+=(.*)~~/g');
+//   const roomUsersSplitted = roomUsers.split(re);
+//   console.log(roomUsersSplitted);
+//   return ret;
+// }

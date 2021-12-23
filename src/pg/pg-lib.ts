@@ -29,6 +29,9 @@ import { Pool, QueryResult, QueryResultRow } from 'pg';
 // console.warn('process.env.DATABASE_URL', process.env.DATABASE_URL);
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
 export async function select(q: string): Promise<QueryResult<QueryResultRow>> {

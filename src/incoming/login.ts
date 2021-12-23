@@ -1,4 +1,4 @@
-import { UserDto } from '../common/userDto';
+import { UserDto } from './loginDto';
 import { prI } from '../prisma-instance';
 
 export async function login(phone: string): Promise<UserDto> {

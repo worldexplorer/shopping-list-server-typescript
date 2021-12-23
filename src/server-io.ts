@@ -4,12 +4,14 @@ import { runConfig, URL } from './server.config';
 
 import { PrismaInit } from './prisma-instance';
 
-import { MessageDto, GetMessagesDto } from './common/messageDto';
+import { GetMessagesDto, MessageDto } from './outgoing/messageDto';
 import { login } from './incoming/login';
-import { LoginDto } from './common/userDto';
+import { LoginDto } from './incoming/loginDto';
 
-import { mockRooms, mockMessages } from './common/mock';
 import { rooms } from './outgoing/rooms';
+import { getMessages } from './outgoing/messages';
+import { newMessage } from './incoming/newMessage';
+import { NewMessageDto } from './incoming/newMessageDto';
 
 export function create(httpServer: http.Server) {
   const ioServer = new socketio.Server(httpServer);
@@ -39,15 +41,23 @@ export function create(httpServer: http.Server) {
       }
     });
 
-    socket.on('message', (data: MessageDto) => {
-      console.log('> MESSAGE', data);
-      ioServer.emit('message', data);
+    socket.on('newMessage', async (json: NewMessageDto) => {
+      console.log('> NEW_MESSAGE', json);
+      const messageInserted: MessageDto = await newMessage(json);
+      ioServer.emit('message', messageInserted);
     });
 
-    socket.on('getMessages', (data: GetMessagesDto) => {
-      console.log('> MESSAGES', data);
-      console.log('   << MESSAGES', mockMessages);
-      socket.emit('messages', mockMessages);
+    socket.on('getMessages', async (json: GetMessagesDto) => {
+      try {
+        console.log('> GET_MESSAGES', json);
+
+        const messagesDto = await getMessages(json);
+        console.log('   << MESSAGES', messagesDto);
+        socket.emit('messages', messagesDto);
+      } catch (e) {
+        console.log('   << ERROR', e);
+        socket.emit('error', e);
+      }
     });
 
     socket.on('connect', () => {
