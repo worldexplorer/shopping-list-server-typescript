@@ -1,29 +1,37 @@
 import { prI } from '../prisma-instance';
-import { NewMessageDto } from './newMessageDto';
 import { MessageDto } from '../outgoing/messageDto';
 import { PurchaseDto } from '../outgoing/purchaseDto';
+import { NewPurchaseDto } from './newPurchaseDto';
 
-export async function newMessage({
-  room,
-  user,
-  content,
-  purchase,
-}: NewMessageDto): Promise<MessageDto> {
-  const messageCreated = await prI.shli_message.create({
-    data: {
-      room,
-      person: user,
-      content,
-      purchase: undefined, // TODO
-    },
-    include: {
-      shli_person: {
-        select: {
-          ident: true,
+export type NewMessageDto = {
+  room: number;
+  user: number;
+  content: string;
+  new_purchase?: NewPurchaseDto;
+};
+
+export async function newMessage(newMsg: NewMessageDto): Promise<MessageDto> {
+  const { room, user, content, new_purchase: purchase } = newMsg;
+
+  const messageCreated = await prI.shli_message
+    .create({
+      data: {
+        room,
+        person: user,
+        content,
+        purchase: undefined, // TODO
+      },
+      include: {
+        shli_person: {
+          select: {
+            ident: true,
+          },
         },
       },
-    },
-  });
+    })
+    .catch(reason => {
+      throw reason;
+    });
 
   const purchaseDto: PurchaseDto | undefined = undefined;
 
@@ -33,6 +41,7 @@ export async function newMessage({
     date_updated: messageCreated.date_updated,
 
     content: messageCreated.content || '',
+    edited: messageCreated.edited,
     room: messageCreated.room,
     user: messageCreated.person,
     user_name: messageCreated.shli_person.ident,

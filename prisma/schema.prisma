@@ -7,306 +7,306 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model shli_constant {
-  id             Int       @id @default(autoincrement())
-  date_updated   DateTime  @default(now()) @db.Timestamp(6)
-  date_created   DateTime  @default(now()) @db.Timestamp(6)
-  date_published DateTime? @db.Timestamp(6)
-  published      Int       @default(1) @db.SmallInt
-  deleted        Int       @default(0) @db.SmallInt
-  manorder       Int       @default(autoincrement())
-  ident          String    @default("") @db.VarChar(250)
-  hashkey        String    @default("") @db.VarChar(250)
-  content        String?
-}
+// model shli_constant {
+//   id             Int       @id @default(autoincrement())
+//   date_updated   DateTime  @default(now()) @db.Timestamp(6)
+//   date_created   DateTime  @default(now()) @db.Timestamp(6)
+//   date_published DateTime? @db.Timestamp(6)
+//   published      Int       @default(1) @db.SmallInt
+//   deleted        Int       @default(0) @db.SmallInt
+//   manorder       Int       @default(autoincrement())
+//   ident          String    @default("") @db.VarChar(250)
+//   hashkey        String    @default("") @db.VarChar(250)
+//   content        String?
+// }
 
-model shli_ic {
-  id             Int       @id @default(autoincrement())
-  date_updated   DateTime  @default(now()) @db.Timestamp(6)
-  date_created   DateTime  @default(now()) @db.Timestamp(6)
-  date_published DateTime? @db.Timestamp(6)
-  published      Int       @default(1) @db.SmallInt
-  deleted        Int       @default(0) @db.SmallInt
-  manorder       Int       @default(autoincrement())
-  ident          String    @default("") @db.VarChar(250)
-  hashkey        String    @default("") @db.VarChar(250)
-  icwhose        Int       @default(0)
-  icwhat         Int       @default(0)
-  ictype         Int       @default(0)
-  icdict         Int       @default(0)
-  param1         String    @default("") @db.VarChar(250)
-  param2         String    @default("") @db.VarChar(250)
-  graycomment    String    @default("") @db.VarChar(250)
-  jsvalidator    Int       @default(0)
-  obligatory     Int       @default(0) @db.SmallInt
-  obligatory_bo  Int       @default(0) @db.SmallInt
-  inbrief        Int       @default(0) @db.SmallInt
-  sorting        Int       @default(0) @db.SmallInt
-  published_bo   Int       @default(1) @db.SmallInt
-}
+// model shli_ic {
+//   id             Int       @id @default(autoincrement())
+//   date_updated   DateTime  @default(now()) @db.Timestamp(6)
+//   date_created   DateTime  @default(now()) @db.Timestamp(6)
+//   date_published DateTime? @db.Timestamp(6)
+//   published      Int       @default(1) @db.SmallInt
+//   deleted        Int       @default(0) @db.SmallInt
+//   manorder       Int       @default(autoincrement())
+//   ident          String    @default("") @db.VarChar(250)
+//   hashkey        String    @default("") @db.VarChar(250)
+//   icwhose        Int       @default(0)
+//   icwhat         Int       @default(0)
+//   ictype         Int       @default(0)
+//   icdict         Int       @default(0)
+//   param1         String    @default("") @db.VarChar(250)
+//   param2         String    @default("") @db.VarChar(250)
+//   graycomment    String    @default("") @db.VarChar(250)
+//   jsvalidator    Int       @default(0)
+//   obligatory     Int       @default(0) @db.SmallInt
+//   obligatory_bo  Int       @default(0) @db.SmallInt
+//   inbrief        Int       @default(0) @db.SmallInt
+//   sorting        Int       @default(0) @db.SmallInt
+//   published_bo   Int       @default(1) @db.SmallInt
+// }
 
-model shli_icdict {
-  id             Int       @id @default(autoincrement())
-  date_updated   DateTime  @default(now()) @db.Timestamp(6)
-  date_created   DateTime  @default(now()) @db.Timestamp(6)
-  date_published DateTime? @db.Timestamp(6)
-  published      Int       @default(1) @db.SmallInt
-  deleted        Int       @default(0) @db.SmallInt
-  manorder       Int       @default(autoincrement())
-  ident          String    @default("") @db.VarChar(250)
-  hashkey        String    @default("") @db.VarChar(250)
-  icwhose        Int       @default(0)
-}
+// model shli_icdict {
+//   id             Int       @id @default(autoincrement())
+//   date_updated   DateTime  @default(now()) @db.Timestamp(6)
+//   date_created   DateTime  @default(now()) @db.Timestamp(6)
+//   date_published DateTime? @db.Timestamp(6)
+//   published      Int       @default(1) @db.SmallInt
+//   deleted        Int       @default(0) @db.SmallInt
+//   manorder       Int       @default(autoincrement())
+//   ident          String    @default("") @db.VarChar(250)
+//   hashkey        String    @default("") @db.VarChar(250)
+//   icwhose        Int       @default(0)
+// }
 
-model shli_icdictcontent {
-  id                 Int       @id @default(autoincrement())
-  date_updated       DateTime  @default(now()) @db.Timestamp(6)
-  date_created       DateTime  @default(now()) @db.Timestamp(6)
-  date_published     DateTime? @db.Timestamp(6)
-  published          Int       @default(1) @db.SmallInt
-  deleted            Int       @default(0) @db.SmallInt
-  manorder           Int       @default(autoincrement())
-  ident              String    @default("") @db.VarChar(250)
-  hashkey            String    @default("") @db.VarChar(250)
-  content            String?
-  label_style        String    @default("") @db.VarChar(250)
-  tf1_width          Int       @default(0)
-  tf1_incolumn       Int       @default(0) @db.SmallInt
-  tf1_addtodict      Int       @default(0) @db.SmallInt
-  tf1_addedpublished Int       @default(0) @db.SmallInt
-  icdict             Int       @default(0)
-}
+// model shli_icdictcontent {
+//   id                 Int       @id @default(autoincrement())
+//   date_updated       DateTime  @default(now()) @db.Timestamp(6)
+//   date_created       DateTime  @default(now()) @db.Timestamp(6)
+//   date_published     DateTime? @db.Timestamp(6)
+//   published          Int       @default(1) @db.SmallInt
+//   deleted            Int       @default(0) @db.SmallInt
+//   manorder           Int       @default(autoincrement())
+//   ident              String    @default("") @db.VarChar(250)
+//   hashkey            String    @default("") @db.VarChar(250)
+//   content            String?
+//   label_style        String    @default("") @db.VarChar(250)
+//   tf1_width          Int       @default(0)
+//   tf1_incolumn       Int       @default(0) @db.SmallInt
+//   tf1_addtodict      Int       @default(0) @db.SmallInt
+//   tf1_addedpublished Int       @default(0) @db.SmallInt
+//   icdict             Int       @default(0)
+// }
 
-model shli_icsheet {
-  id             Int       @id @default(autoincrement())
-  date_updated   DateTime  @default(now()) @db.Timestamp(6)
-  date_created   DateTime  @default(now()) @db.Timestamp(6)
-  date_published DateTime? @db.Timestamp(6)
-  published      Int       @default(1) @db.SmallInt
-  deleted        Int       @default(0) @db.SmallInt
-  manorder       Int       @default(autoincrement())
-  ident          String    @default("") @db.VarChar(250)
-  icwhose        Int       @default(0)
-  content        String?
-}
+// model shli_icsheet {
+//   id             Int       @id @default(autoincrement())
+//   date_updated   DateTime  @default(now()) @db.Timestamp(6)
+//   date_created   DateTime  @default(now()) @db.Timestamp(6)
+//   date_published DateTime? @db.Timestamp(6)
+//   published      Int       @default(1) @db.SmallInt
+//   deleted        Int       @default(0) @db.SmallInt
+//   manorder       Int       @default(autoincrement())
+//   ident          String    @default("") @db.VarChar(250)
+//   icwhose        Int       @default(0)
+//   content        String?
+// }
 
-model shli_ictype {
-  id             Int       @id @default(autoincrement())
-  date_updated   DateTime  @default(now()) @db.Timestamp(6)
-  date_created   DateTime  @default(now()) @db.Timestamp(6)
-  date_published DateTime? @db.Timestamp(6)
-  published      Int       @default(0) @db.SmallInt
-  deleted        Int       @default(0) @db.SmallInt
-  manorder       Int       @default(autoincrement())
-  ident          String    @default("") @db.VarChar(250)
-  hashkey        String    @default("") @db.VarChar(250)
-}
+// model shli_ictype {
+//   id             Int       @id @default(autoincrement())
+//   date_updated   DateTime  @default(now()) @db.Timestamp(6)
+//   date_created   DateTime  @default(now()) @db.Timestamp(6)
+//   date_published DateTime? @db.Timestamp(6)
+//   published      Int       @default(0) @db.SmallInt
+//   deleted        Int       @default(0) @db.SmallInt
+//   manorder       Int       @default(autoincrement())
+//   ident          String    @default("") @db.VarChar(250)
+//   hashkey        String    @default("") @db.VarChar(250)
+// }
 
-model shli_icwhose {
-  id             Int       @id @default(autoincrement())
-  date_updated   DateTime  @default(now()) @db.Timestamp(6)
-  date_created   DateTime  @default(now()) @db.Timestamp(6)
-  date_published DateTime? @db.Timestamp(6)
-  published      Int       @default(1) @db.SmallInt
-  deleted        Int       @default(0) @db.SmallInt
-  manorder       Int       @default(autoincrement())
-  ident          String    @default("") @db.VarChar(250)
-  hashkey        String    @default("") @db.VarChar(250)
-  brief          String?
-  jsv_debug      Int       @default(0) @db.SmallInt
-  bo_only        Int       @default(0) @db.SmallInt
-}
+// model shli_icwhose {
+//   id             Int       @id @default(autoincrement())
+//   date_updated   DateTime  @default(now()) @db.Timestamp(6)
+//   date_created   DateTime  @default(now()) @db.Timestamp(6)
+//   date_published DateTime? @db.Timestamp(6)
+//   published      Int       @default(1) @db.SmallInt
+//   deleted        Int       @default(0) @db.SmallInt
+//   manorder       Int       @default(autoincrement())
+//   ident          String    @default("") @db.VarChar(250)
+//   hashkey        String    @default("") @db.VarChar(250)
+//   brief          String?
+//   jsv_debug      Int       @default(0) @db.SmallInt
+//   bo_only        Int       @default(0) @db.SmallInt
+// }
 
-model shli_img {
-  id              Int       @id @default(autoincrement())
-  date_updated    DateTime  @default(now()) @db.Timestamp(6)
-  date_created    DateTime  @default(now()) @db.Timestamp(6)
-  date_published  DateTime? @db.Timestamp(6)
-  published       Int       @default(0) @db.SmallInt
-  deleted         Int       @default(0) @db.SmallInt
-  manorder        Int       @default(autoincrement())
-  ident           String    @default("") @db.VarChar(250)
-  img             String    @default("") @db.VarChar(255)
-  img_w           Int       @default(0)
-  img_h           Int       @default(0)
-  img_txt         String    @default("") @db.VarChar(255)
-  img_big         String    @default("") @db.VarChar(255)
-  img_big_w       Int       @default(0)
-  img_big_h       Int       @default(0)
-  img_big_txt     String    @default("") @db.VarChar(255)
-  owner_entity    String    @default("") @db.VarChar(250)
-  owner_entity_id Int       @default(1)
-  imgtype         Int       @default(1)
-  img_src         String    @default("") @db.VarChar(250)
-  img_big_src     String    @default("") @db.VarChar(250)
-  img_main        Int       @default(0) @db.SmallInt
-  crc32           Int       @default(0)
-  date_faceted    DateTime? @db.Timestamp(6)
-  faceted         Int       @default(0) @db.SmallInt
-  faceting        Int       @default(0) @db.SmallInt
-}
+// model shli_img {
+//   id              Int       @id @default(autoincrement())
+//   date_updated    DateTime  @default(now()) @db.Timestamp(6)
+//   date_created    DateTime  @default(now()) @db.Timestamp(6)
+//   date_published  DateTime? @db.Timestamp(6)
+//   published       Int       @default(0) @db.SmallInt
+//   deleted         Int       @default(0) @db.SmallInt
+//   manorder        Int       @default(autoincrement())
+//   ident           String    @default("") @db.VarChar(250)
+//   img             String    @default("") @db.VarChar(255)
+//   img_w           Int       @default(0)
+//   img_h           Int       @default(0)
+//   img_txt         String    @default("") @db.VarChar(255)
+//   img_big         String    @default("") @db.VarChar(255)
+//   img_big_w       Int       @default(0)
+//   img_big_h       Int       @default(0)
+//   img_big_txt     String    @default("") @db.VarChar(255)
+//   owner_entity    String    @default("") @db.VarChar(250)
+//   owner_entity_id Int       @default(1)
+//   imgtype         Int       @default(1)
+//   img_src         String    @default("") @db.VarChar(250)
+//   img_big_src     String    @default("") @db.VarChar(250)
+//   img_main        Int       @default(0) @db.SmallInt
+//   crc32           Int       @default(0)
+//   date_faceted    DateTime? @db.Timestamp(6)
+//   faceted         Int       @default(0) @db.SmallInt
+//   faceting        Int       @default(0) @db.SmallInt
+// }
 
-model shli_imgtype {
-  id                          Int       @id @default(autoincrement())
-  date_updated                DateTime  @default(now()) @db.Timestamp(6)
-  date_created                DateTime  @default(now()) @db.Timestamp(6)
-  date_published              DateTime? @db.Timestamp(6)
-  published                   Int       @default(1) @db.SmallInt
-  deleted                     Int       @default(0) @db.SmallInt
-  manorder                    Int       @default(autoincrement())
-  ident                       String    @default("") @db.VarChar(250)
-  hashkey                     String    @default("") @db.VarChar(250)
-  content                     String?
-  imglimit                    Int       @default(0)
-  merge_seed                  Int       @default(0)
-  resize_default_qlty         String    @default(dbgenerated("85")) @db.VarChar(250)
-  resize_default_width        String    @default("") @db.VarChar(250)
-  resize_default_height       String    @default("") @db.VarChar(250)
-  resize_published            Int       @default(1) @db.SmallInt
-  resize_default_checked      Int       @default(0) @db.SmallInt
-  big_resize_default_qlty     String    @default(dbgenerated("85")) @db.VarChar(250)
-  big_resize_default_width    String    @default("") @db.VarChar(250)
-  big_resize_default_height   String    @default("") @db.VarChar(250)
-  big_resize_published        Int       @default(1) @db.SmallInt
-  big_resize_default_checked  Int       @default(0) @db.SmallInt
-  first_autoresize_qlty       String    @default(dbgenerated("85")) @db.VarChar(250)
-  first_autoresize_width      String    @default("") @db.VarChar(250)
-  first_autoresize_height     String    @default("") @db.VarChar(250)
-  first_autoresize_apply      Int       @default(0) @db.SmallInt
-  first_autoresize_debug      Int       @default(0) @db.SmallInt
-  first_autoresize_tpl_ex     String?
-  first_autoresize_tpl_nex    String?
-  first_merge_img             String    @default("") @db.VarChar(250)
-  first_merge_dstfname        String    @default("") @db.VarChar(250)
-  first_merge_alfa            Int       @default(30) @db.SmallInt
-  first_merge_type            Int       @default(0) @db.SmallInt
-  first_merge_apply           Int       @default(1) @db.SmallInt
-  every_autoresize_qlty       String    @default(dbgenerated("85")) @db.VarChar(250)
-  every_autoresize_width      String    @default("") @db.VarChar(250)
-  every_autoresize_height     String    @default("") @db.VarChar(250)
-  every_autoresize_apply      Int       @default(0) @db.SmallInt
-  every_autoresize_debug      Int       @default(0) @db.SmallInt
-  every_autoresize_tpl_ex     String?
-  every_autoresize_tpl_nex    String?
-  every_merge_img             String    @default("") @db.VarChar(250)
-  every_merge_dstfname        String    @default("") @db.VarChar(250)
-  every_merge_alfa            Int       @default(30) @db.SmallInt
-  every_merge_type            Int       @default(0) @db.SmallInt
-  every_merge_apply           Int       @default(1) @db.SmallInt
-  first2_autoresize_qlty      String    @default(dbgenerated("85")) @db.VarChar(250)
-  first2_autoresize_width     String    @default("") @db.VarChar(250)
-  first2_autoresize_height    String    @default("") @db.VarChar(250)
-  first2_autoresize_firstonly Int       @default(1) @db.SmallInt
-  first2_autoresize_apply     Int       @default(0) @db.SmallInt
-  first2_autoresize_debug     Int       @default(0) @db.SmallInt
-  first2_autoresize_tpl_ex    String?
-  first2_autoresize_tpl_nex   String?
-  first2_merge_img            String    @default("") @db.VarChar(250)
-  first2_merge_dstfname       String    @default("") @db.VarChar(250)
-  first2_merge_alfa           Int       @default(30) @db.SmallInt
-  first2_merge_type           Int       @default(0) @db.SmallInt
-  first2_merge_apply          Int       @default(1) @db.SmallInt
-  every2_autoresize_qlty      String    @default(dbgenerated("85")) @db.VarChar(250)
-  every2_autoresize_width     String    @default("") @db.VarChar(250)
-  every2_autoresize_height    String    @default("") @db.VarChar(250)
-  every2_autoresize_firstonly Int       @default(1) @db.SmallInt
-  every2_autoresize_apply     Int       @default(0) @db.SmallInt
-  every2_autoresize_debug     Int       @default(0) @db.SmallInt
-  every2_autoresize_tpl_ex    String?
-  every2_autoresize_tpl_nex   String?
-  every2_merge_img            String    @default("") @db.VarChar(250)
-  every2_merge_dstfname       String    @default("") @db.VarChar(250)
-  every2_merge_alfa           Int       @default(30) @db.SmallInt
-  every2_merge_type           Int       @default(0) @db.SmallInt
-  every2_merge_apply          Int       @default(1) @db.SmallInt
-  first3_autoresize_qlty      String    @default(dbgenerated("85")) @db.VarChar(250)
-  first3_autoresize_width     String    @default("") @db.VarChar(250)
-  first3_autoresize_height    String    @default("") @db.VarChar(250)
-  first3_autoresize_firstonly Int       @default(1) @db.SmallInt
-  first3_autoresize_apply     Int       @default(0) @db.SmallInt
-  first3_autoresize_debug     Int       @default(0) @db.SmallInt
-  first3_autoresize_tpl_ex    String?
-  first3_autoresize_tpl_nex   String?
-  first3_merge_img            String    @default("") @db.VarChar(250)
-  first3_merge_dstfname       String    @default("") @db.VarChar(250)
-  first3_merge_alfa           Int       @default(30) @db.SmallInt
-  first3_merge_type           Int       @default(0) @db.SmallInt
-  first3_merge_apply          Int       @default(1) @db.SmallInt
-  every3_autoresize_qlty      String    @default(dbgenerated("85")) @db.VarChar(250)
-  every3_autoresize_width     String    @default("") @db.VarChar(250)
-  every3_autoresize_height    String    @default("") @db.VarChar(250)
-  every3_autoresize_firstonly Int       @default(1) @db.SmallInt
-  every3_autoresize_apply     Int       @default(0) @db.SmallInt
-  every3_autoresize_debug     Int       @default(0) @db.SmallInt
-  every3_autoresize_tpl_ex    String?
-  every3_autoresize_tpl_nex   String?
-  every3_merge_img            String    @default("") @db.VarChar(250)
-  every3_merge_dstfname       String    @default("") @db.VarChar(250)
-  every3_merge_alfa           Int       @default(30) @db.SmallInt
-  every3_merge_type           Int       @default(0) @db.SmallInt
-  every3_merge_apply          Int       @default(1) @db.SmallInt
-  first4_autoresize_qlty      String    @default(dbgenerated("85")) @db.VarChar(250)
-  first4_autoresize_width     String    @default("") @db.VarChar(250)
-  first4_autoresize_height    String    @default("") @db.VarChar(250)
-  first4_autoresize_firstonly Int       @default(1) @db.SmallInt
-  first4_autoresize_apply     Int       @default(0) @db.SmallInt
-  first4_autoresize_debug     Int       @default(0) @db.SmallInt
-  first4_autoresize_tpl_ex    String?
-  first4_autoresize_tpl_nex   String?
-  first4_merge_img            String    @default("") @db.VarChar(250)
-  first4_merge_dstfname       String    @default("") @db.VarChar(250)
-  first4_merge_alfa           Int       @default(30) @db.SmallInt
-  first4_merge_type           Int       @default(0) @db.SmallInt
-  first4_merge_apply          Int       @default(1) @db.SmallInt
-  every4_autoresize_qlty      String    @default(dbgenerated("85")) @db.VarChar(250)
-  every4_autoresize_width     String    @default("") @db.VarChar(250)
-  every4_autoresize_height    String    @default("") @db.VarChar(250)
-  every4_autoresize_firstonly Int       @default(1) @db.SmallInt
-  every4_autoresize_apply     Int       @default(0) @db.SmallInt
-  every4_autoresize_debug     Int       @default(0) @db.SmallInt
-  every4_autoresize_tpl_ex    String?
-  every4_autoresize_tpl_nex   String?
-  every4_merge_img            String    @default("") @db.VarChar(250)
-  every4_merge_dstfname       String    @default("") @db.VarChar(250)
-  every4_merge_alfa           Int       @default(30) @db.SmallInt
-  every4_merge_type           Int       @default(0) @db.SmallInt
-  every4_merge_apply          Int       @default(1) @db.SmallInt
-  img_present                 Int       @default(1) @db.SmallInt
-  img_newqnty                 Int       @default(1) @db.SmallInt
-  img_txt_present             Int       @default(1) @db.SmallInt
-  img_txt_eq_fname            Int       @default(1) @db.SmallInt
-  img_url_present             Int       @default(1) @db.SmallInt
-  img_zip_present             Int       @default(1) @db.SmallInt
-  img_big_present             Int       @default(1) @db.SmallInt
-  img_big_newqnty             Int       @default(1) @db.SmallInt
-  img_big_txt_present         Int       @default(1) @db.SmallInt
-  img_big_txt_eq_fname        Int       @default(1) @db.SmallInt
-  img_big_url_present         Int       @default(1) @db.SmallInt
-  img_big_zip_present         Int       @default(1) @db.SmallInt
-  img_thumb_present           Int       @default(1) @db.SmallInt
-  img_thumb_qlty              String    @default(dbgenerated("85")) @db.VarChar(250)
-  img_thumb_width             String    @default("") @db.VarChar(250)
-  img_thumb_height            String    @default("80") @db.VarChar(250)
-  msg_ident                   String    @default("Картинка") @db.VarChar(250)
-  msg_change                  String    @default("изменить картинку") @db.VarChar(250)
-  msg_add                     String    @default("Новая картинка") @db.VarChar(250)
-  msg_img                     String    @default("маленькая") @db.VarChar(250)
-  msg_img_big                 String    @default("большая") @db.VarChar(250)
-  img_table                   String    @default("") @db.VarChar(250)
-}
+// model shli_imgtype {
+//   id                          Int       @id @default(autoincrement())
+//   date_updated                DateTime  @default(now()) @db.Timestamp(6)
+//   date_created                DateTime  @default(now()) @db.Timestamp(6)
+//   date_published              DateTime? @db.Timestamp(6)
+//   published                   Int       @default(1) @db.SmallInt
+//   deleted                     Int       @default(0) @db.SmallInt
+//   manorder                    Int       @default(autoincrement())
+//   ident                       String    @default("") @db.VarChar(250)
+//   hashkey                     String    @default("") @db.VarChar(250)
+//   content                     String?
+//   imglimit                    Int       @default(0)
+//   merge_seed                  Int       @default(0)
+//   resize_default_qlty         String    @default(dbgenerated("85")) @db.VarChar(250)
+//   resize_default_width        String    @default("") @db.VarChar(250)
+//   resize_default_height       String    @default("") @db.VarChar(250)
+//   resize_published            Int       @default(1) @db.SmallInt
+//   resize_default_checked      Int       @default(0) @db.SmallInt
+//   big_resize_default_qlty     String    @default(dbgenerated("85")) @db.VarChar(250)
+//   big_resize_default_width    String    @default("") @db.VarChar(250)
+//   big_resize_default_height   String    @default("") @db.VarChar(250)
+//   big_resize_published        Int       @default(1) @db.SmallInt
+//   big_resize_default_checked  Int       @default(0) @db.SmallInt
+//   first_autoresize_qlty       String    @default(dbgenerated("85")) @db.VarChar(250)
+//   first_autoresize_width      String    @default("") @db.VarChar(250)
+//   first_autoresize_height     String    @default("") @db.VarChar(250)
+//   first_autoresize_apply      Int       @default(0) @db.SmallInt
+//   first_autoresize_debug      Int       @default(0) @db.SmallInt
+//   first_autoresize_tpl_ex     String?
+//   first_autoresize_tpl_nex    String?
+//   first_merge_img             String    @default("") @db.VarChar(250)
+//   first_merge_dstfname        String    @default("") @db.VarChar(250)
+//   first_merge_alfa            Int       @default(30) @db.SmallInt
+//   first_merge_type            Int       @default(0) @db.SmallInt
+//   first_merge_apply           Int       @default(1) @db.SmallInt
+//   every_autoresize_qlty       String    @default(dbgenerated("85")) @db.VarChar(250)
+//   every_autoresize_width      String    @default("") @db.VarChar(250)
+//   every_autoresize_height     String    @default("") @db.VarChar(250)
+//   every_autoresize_apply      Int       @default(0) @db.SmallInt
+//   every_autoresize_debug      Int       @default(0) @db.SmallInt
+//   every_autoresize_tpl_ex     String?
+//   every_autoresize_tpl_nex    String?
+//   every_merge_img             String    @default("") @db.VarChar(250)
+//   every_merge_dstfname        String    @default("") @db.VarChar(250)
+//   every_merge_alfa            Int       @default(30) @db.SmallInt
+//   every_merge_type            Int       @default(0) @db.SmallInt
+//   every_merge_apply           Int       @default(1) @db.SmallInt
+//   first2_autoresize_qlty      String    @default(dbgenerated("85")) @db.VarChar(250)
+//   first2_autoresize_width     String    @default("") @db.VarChar(250)
+//   first2_autoresize_height    String    @default("") @db.VarChar(250)
+//   first2_autoresize_firstonly Int       @default(1) @db.SmallInt
+//   first2_autoresize_apply     Int       @default(0) @db.SmallInt
+//   first2_autoresize_debug     Int       @default(0) @db.SmallInt
+//   first2_autoresize_tpl_ex    String?
+//   first2_autoresize_tpl_nex   String?
+//   first2_merge_img            String    @default("") @db.VarChar(250)
+//   first2_merge_dstfname       String    @default("") @db.VarChar(250)
+//   first2_merge_alfa           Int       @default(30) @db.SmallInt
+//   first2_merge_type           Int       @default(0) @db.SmallInt
+//   first2_merge_apply          Int       @default(1) @db.SmallInt
+//   every2_autoresize_qlty      String    @default(dbgenerated("85")) @db.VarChar(250)
+//   every2_autoresize_width     String    @default("") @db.VarChar(250)
+//   every2_autoresize_height    String    @default("") @db.VarChar(250)
+//   every2_autoresize_firstonly Int       @default(1) @db.SmallInt
+//   every2_autoresize_apply     Int       @default(0) @db.SmallInt
+//   every2_autoresize_debug     Int       @default(0) @db.SmallInt
+//   every2_autoresize_tpl_ex    String?
+//   every2_autoresize_tpl_nex   String?
+//   every2_merge_img            String    @default("") @db.VarChar(250)
+//   every2_merge_dstfname       String    @default("") @db.VarChar(250)
+//   every2_merge_alfa           Int       @default(30) @db.SmallInt
+//   every2_merge_type           Int       @default(0) @db.SmallInt
+//   every2_merge_apply          Int       @default(1) @db.SmallInt
+//   first3_autoresize_qlty      String    @default(dbgenerated("85")) @db.VarChar(250)
+//   first3_autoresize_width     String    @default("") @db.VarChar(250)
+//   first3_autoresize_height    String    @default("") @db.VarChar(250)
+//   first3_autoresize_firstonly Int       @default(1) @db.SmallInt
+//   first3_autoresize_apply     Int       @default(0) @db.SmallInt
+//   first3_autoresize_debug     Int       @default(0) @db.SmallInt
+//   first3_autoresize_tpl_ex    String?
+//   first3_autoresize_tpl_nex   String?
+//   first3_merge_img            String    @default("") @db.VarChar(250)
+//   first3_merge_dstfname       String    @default("") @db.VarChar(250)
+//   first3_merge_alfa           Int       @default(30) @db.SmallInt
+//   first3_merge_type           Int       @default(0) @db.SmallInt
+//   first3_merge_apply          Int       @default(1) @db.SmallInt
+//   every3_autoresize_qlty      String    @default(dbgenerated("85")) @db.VarChar(250)
+//   every3_autoresize_width     String    @default("") @db.VarChar(250)
+//   every3_autoresize_height    String    @default("") @db.VarChar(250)
+//   every3_autoresize_firstonly Int       @default(1) @db.SmallInt
+//   every3_autoresize_apply     Int       @default(0) @db.SmallInt
+//   every3_autoresize_debug     Int       @default(0) @db.SmallInt
+//   every3_autoresize_tpl_ex    String?
+//   every3_autoresize_tpl_nex   String?
+//   every3_merge_img            String    @default("") @db.VarChar(250)
+//   every3_merge_dstfname       String    @default("") @db.VarChar(250)
+//   every3_merge_alfa           Int       @default(30) @db.SmallInt
+//   every3_merge_type           Int       @default(0) @db.SmallInt
+//   every3_merge_apply          Int       @default(1) @db.SmallInt
+//   first4_autoresize_qlty      String    @default(dbgenerated("85")) @db.VarChar(250)
+//   first4_autoresize_width     String    @default("") @db.VarChar(250)
+//   first4_autoresize_height    String    @default("") @db.VarChar(250)
+//   first4_autoresize_firstonly Int       @default(1) @db.SmallInt
+//   first4_autoresize_apply     Int       @default(0) @db.SmallInt
+//   first4_autoresize_debug     Int       @default(0) @db.SmallInt
+//   first4_autoresize_tpl_ex    String?
+//   first4_autoresize_tpl_nex   String?
+//   first4_merge_img            String    @default("") @db.VarChar(250)
+//   first4_merge_dstfname       String    @default("") @db.VarChar(250)
+//   first4_merge_alfa           Int       @default(30) @db.SmallInt
+//   first4_merge_type           Int       @default(0) @db.SmallInt
+//   first4_merge_apply          Int       @default(1) @db.SmallInt
+//   every4_autoresize_qlty      String    @default(dbgenerated("85")) @db.VarChar(250)
+//   every4_autoresize_width     String    @default("") @db.VarChar(250)
+//   every4_autoresize_height    String    @default("") @db.VarChar(250)
+//   every4_autoresize_firstonly Int       @default(1) @db.SmallInt
+//   every4_autoresize_apply     Int       @default(0) @db.SmallInt
+//   every4_autoresize_debug     Int       @default(0) @db.SmallInt
+//   every4_autoresize_tpl_ex    String?
+//   every4_autoresize_tpl_nex   String?
+//   every4_merge_img            String    @default("") @db.VarChar(250)
+//   every4_merge_dstfname       String    @default("") @db.VarChar(250)
+//   every4_merge_alfa           Int       @default(30) @db.SmallInt
+//   every4_merge_type           Int       @default(0) @db.SmallInt
+//   every4_merge_apply          Int       @default(1) @db.SmallInt
+//   img_present                 Int       @default(1) @db.SmallInt
+//   img_newqnty                 Int       @default(1) @db.SmallInt
+//   img_txt_present             Int       @default(1) @db.SmallInt
+//   img_txt_eq_fname            Int       @default(1) @db.SmallInt
+//   img_url_present             Int       @default(1) @db.SmallInt
+//   img_zip_present             Int       @default(1) @db.SmallInt
+//   img_big_present             Int       @default(1) @db.SmallInt
+//   img_big_newqnty             Int       @default(1) @db.SmallInt
+//   img_big_txt_present         Int       @default(1) @db.SmallInt
+//   img_big_txt_eq_fname        Int       @default(1) @db.SmallInt
+//   img_big_url_present         Int       @default(1) @db.SmallInt
+//   img_big_zip_present         Int       @default(1) @db.SmallInt
+//   img_thumb_present           Int       @default(1) @db.SmallInt
+//   img_thumb_qlty              String    @default(dbgenerated("85")) @db.VarChar(250)
+//   img_thumb_width             String    @default("") @db.VarChar(250)
+//   img_thumb_height            String    @default("80") @db.VarChar(250)
+//   msg_ident                   String    @default("Картинка") @db.VarChar(250)
+//   msg_change                  String    @default("изменить картинку") @db.VarChar(250)
+//   msg_add                     String    @default("Новая картинка") @db.VarChar(250)
+//   msg_img                     String    @default("маленькая") @db.VarChar(250)
+//   msg_img_big                 String    @default("большая") @db.VarChar(250)
+//   img_table                   String    @default("") @db.VarChar(250)
+// }
 
-model shli_jsvalidator {
-  id             Int       @id @default(autoincrement())
-  date_updated   DateTime  @default(now()) @db.Timestamp(6)
-  date_created   DateTime  @default(now()) @db.Timestamp(6)
-  date_published DateTime? @db.Timestamp(6)
-  published      Int       @default(1) @db.SmallInt
-  deleted        Int       @default(0) @db.SmallInt
-  manorder       Int       @default(autoincrement())
-  ident          String    @default("") @db.VarChar(250)
-  hashkey        String    @default("") @db.VarChar(250)
-  content        String?
-}
+// model shli_jsvalidator {
+//   id             Int       @id @default(autoincrement())
+//   date_updated   DateTime  @default(now()) @db.Timestamp(6)
+//   date_created   DateTime  @default(now()) @db.Timestamp(6)
+//   date_published DateTime? @db.Timestamp(6)
+//   published      Int       @default(1) @db.SmallInt
+//   deleted        Int       @default(0) @db.SmallInt
+//   manorder       Int       @default(autoincrement())
+//   ident          String    @default("") @db.VarChar(250)
+//   hashkey        String    @default("") @db.VarChar(250)
+//   content        String?
+// }
 
 model shli_m2m_puritem_person {
   id             Int       @id @default(autoincrement())
@@ -354,6 +354,7 @@ model shli_message {
   room           Int
   person         Int
   content        String?
+  edited         Boolean   @default(false) @db.Boolean
   purchase       Int?
   shli_person    shli_person    @relation(fields: [person], references: [id], onDelete: NoAction, onUpdate: NoAction)
   shli_purchase  shli_purchase? @relation(fields: [purchase], references: [id], onDelete: NoAction, onUpdate: NoAction)

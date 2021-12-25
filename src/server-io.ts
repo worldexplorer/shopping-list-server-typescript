@@ -4,20 +4,26 @@ import { runConfig, URL } from './server.config';
 
 import { PrismaInit } from './prisma-instance';
 
-import { GetMessagesDto, MessageDto } from './outgoing/messageDto';
+import { MessageDto } from './outgoing/messageDto';
 import { login } from './incoming/login';
 import { LoginDto } from './incoming/loginDto';
 
 import { rooms } from './outgoing/rooms';
-import { getMessages } from './outgoing/messages';
+import { GetMessagesDto, getMessages } from './outgoing/messages';
 import { newMessage } from './incoming/newMessage';
-import { NewMessageDto } from './incoming/newMessageDto';
+import { NewMessageDto } from './incoming/newMessage';
+import { editMessage, EditMessageDto } from './incoming/editMessage';
 
 export function create(httpServer: http.Server) {
   const ioServer = new socketio.Server(httpServer);
 
   ioServer.on('connect', socket => {
     console.log('Socket.IO client connected', socket.id);
+
+    const sendServerError = (reason: any) => {
+      console.log('   << ERROR', reason);
+      socket.emit('error', reason);
+    };
 
     socket.on('typing', (data: any) => {
       // console.log('> TYPING', data);
@@ -36,15 +42,28 @@ export function create(httpServer: http.Server) {
         console.log('   << ROOMS', JSON.stringify(roomsDto));
         socket.emit('rooms', roomsDto);
       } catch (e) {
-        console.log('   << ERROR', e);
-        socket.emit('error', e);
+        sendServerError(e);
       }
     });
 
     socket.on('newMessage', async (json: NewMessageDto) => {
       console.log('> NEW_MESSAGE', json);
-      const messageInserted: MessageDto = await newMessage(json);
-      ioServer.emit('message', messageInserted);
+      try {
+        const messageInserted: MessageDto = await newMessage(json);
+        ioServer.emit('message', messageInserted);
+      } catch (e) {
+        sendServerError(e);
+      }
+    });
+
+    socket.on('editMessage', async (json: EditMessageDto) => {
+      console.log('> EDIT_MESSAGE', json);
+      try {
+        const messageEdited: MessageDto = await editMessage(json);
+        ioServer.emit('message', messageEdited);
+      } catch (e) {
+        sendServerError(e);
+      }
     });
 
     socket.on('getMessages', async (json: GetMessagesDto) => {
@@ -55,8 +74,7 @@ export function create(httpServer: http.Server) {
         console.log('   << MESSAGES', messagesDto);
         socket.emit('messages', messagesDto);
       } catch (e) {
-        console.log('   << ERROR', e);
-        socket.emit('error', e);
+        sendServerError(e);
       }
     });
 

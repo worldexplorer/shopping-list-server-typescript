@@ -1,17 +1,13 @@
 import { PurchaseDto } from './purchaseDto';
 
-export type GetMessagesDto = {
-  room: number;
-  fromMessageId: number;
-  deviceTimezoneOffsetMinutes: number;
-};
-
 export type MessageDto = {
   id: number;
   date_created: Date;
   date_updated: Date;
 
   content: string;
+  edited: boolean;
+
   room: number;
   user: number;
   user_name: string;

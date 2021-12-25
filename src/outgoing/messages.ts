@@ -1,7 +1,14 @@
 import { prI } from '../prisma-instance';
 import { PurchaseDto } from './purchaseDto';
 import { dateShift } from '../utils/conversion.tz';
-import { GetMessagesDto, MessageDto, MessagesDto } from './messageDto';
+import { MessageDto, MessagesDto } from './messageDto';
+
+export type GetMessagesDto = {
+  room: number;
+  fromMessageId: number;
+  deviceTimezoneOffsetMinutes: number;
+  currentDeviceTime: Date;
+};
 
 export async function getMessages({
   room,
@@ -77,6 +84,7 @@ export async function getMessages({
       date_updated: dateShift(msgDao.date_updated, deviceTimezoneOffsetMinutes),
 
       content: msgDao.content ?? '',
+      edited: msgDao.edited,
       room: msgDao.room,
       user: msgDao.person,
       user_name: msgDao.shli_person.ident,
