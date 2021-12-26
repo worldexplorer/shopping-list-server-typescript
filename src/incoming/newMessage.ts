@@ -2,6 +2,7 @@ import { prI } from '../prisma-instance';
 import { MessageDto } from '../outgoing/messageDto';
 import { PurchaseDto } from '../outgoing/purchaseDto';
 import { NewPurchaseDto } from './newPurchaseDto';
+import { messageDaoToDto } from '../outgoing/messages';
 
 export type NewMessageDto = {
   room: number;
@@ -10,7 +11,7 @@ export type NewMessageDto = {
   new_purchase?: NewPurchaseDto;
 };
 
-export async function newMessage(newMsg: NewMessageDto): Promise<MessageDto> {
+export async function newMessage(newMsg: NewMessageDto, roomUsers: number[]): Promise<MessageDto> {
   const { room, user, content, new_purchase: purchase } = newMsg;
 
   const messageCreated = await prI.shli_message
@@ -20,9 +21,10 @@ export async function newMessage(newMsg: NewMessageDto): Promise<MessageDto> {
         person: user,
         content,
         purchase: undefined, // TODO
+        persons_sent: roomUsers,
       },
       include: {
-        shli_person: {
+        Creator: {
           select: {
             ident: true,
           },
@@ -33,21 +35,7 @@ export async function newMessage(newMsg: NewMessageDto): Promise<MessageDto> {
       throw reason;
     });
 
-  const purchaseDto: PurchaseDto | undefined = undefined;
-
-  const ret: MessageDto = {
-    id: messageCreated.id,
-    date_created: messageCreated.date_created,
-    date_updated: messageCreated.date_updated,
-
-    content: messageCreated.content || '',
-    edited: messageCreated.edited,
-    room: messageCreated.room,
-    user: messageCreated.person,
-    user_name: messageCreated.shli_person.ident,
-
-    purchaseId: messageCreated.purchase ?? undefined,
-    purchase: purchaseDto,
-  };
+  const deviceTimezoneOffsetMinutes = 0;
+  const ret: MessageDto = messageDaoToDto(messageCreated, undefined, deviceTimezoneOffsetMinutes);
   return ret;
 }

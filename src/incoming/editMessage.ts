@@ -1,5 +1,7 @@
 import { prI } from '../prisma-instance';
 import { MessageDto } from '../outgoing/messageDto';
+import { messageDaoToDto, purchaseNullableDaoToDtoUndefined } from '../outgoing/messages';
+import { PurchaseDto } from '../outgoing/purchaseDto';
 
 export type EditMessageDto = {
   id: number;
@@ -17,31 +19,36 @@ export async function editMessage(editMsg: EditMessageDto): Promise<MessageDto> 
         edited: true,
       },
       include: {
-        shli_person: {
+        Creator: {
           select: {
             ident: true,
           },
         },
-        shli_purchase: true,
+        Purchase: {
+          include: {
+            Person_created: {
+              select: {
+                ident: true,
+              },
+            },
+            Person_purchased: {
+              select: {
+                ident: true,
+              },
+            },
+          },
+        },
       },
     })
     .catch(reason => {
       throw reason;
     });
 
-  const ret: MessageDto = {
-    id: messageEdited.id,
-    date_created: messageEdited.date_created,
-    date_updated: messageEdited.date_updated,
-
-    content: messageEdited.content || '',
-    edited: messageEdited.edited,
-    room: messageEdited.room,
-    user: messageEdited.person,
-    user_name: messageEdited.shli_person.ident,
-
-    purchaseId: messageEdited.purchase ?? undefined,
-  };
-
+  const deviceTimezoneOffsetMinutes = 0;
+  const purDto: PurchaseDto | undefined = purchaseNullableDaoToDtoUndefined(
+    messageEdited.Purchase,
+    deviceTimezoneOffsetMinutes
+  );
+  const ret: MessageDto = messageDaoToDto(messageEdited, purDto, deviceTimezoneOffsetMinutes);
   return ret;
 }

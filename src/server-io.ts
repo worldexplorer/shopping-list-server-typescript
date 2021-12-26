@@ -13,6 +13,13 @@ import { GetMessagesDto, getMessages } from './outgoing/messages';
 import { newMessage } from './incoming/newMessage';
 import { NewMessageDto } from './incoming/newMessage';
 import { editMessage, EditMessageDto } from './incoming/editMessage';
+import {
+  markMessageRead,
+  MarkMessageReadDto,
+  UpdatedMessageReadDto,
+} from './incoming/markMessageRead';
+
+const userBySocket = new Map<string, number>();
 
 export function create(httpServer: http.Server) {
   const ioServer = new socketio.Server(httpServer);
@@ -35,6 +42,11 @@ export function create(httpServer: http.Server) {
         console.log('> LOGIN', json);
 
         const userDto = await login(json.phone);
+
+        userBySocket.set(socket.id, userDto.id);
+        const record = `   socket[${socket.id}]:userId[${userDto.id}]`;
+        console.log(`${record} ADDED to userBySocket Map`);
+
         console.log('   << USER', userDto);
         socket.emit('user', userDto);
 
@@ -49,7 +61,9 @@ export function create(httpServer: http.Server) {
     socket.on('newMessage', async (json: NewMessageDto) => {
       console.log('> NEW_MESSAGE', json);
       try {
-        const messageInserted: MessageDto = await newMessage(json);
+        const roomUsers = Array.from(userBySocket.values());
+
+        const messageInserted: MessageDto = await newMessage(json, roomUsers);
         ioServer.emit('message', messageInserted);
       } catch (e) {
         sendServerError(e);
@@ -61,6 +75,16 @@ export function create(httpServer: http.Server) {
       try {
         const messageEdited: MessageDto = await editMessage(json);
         ioServer.emit('message', messageEdited);
+      } catch (e) {
+        sendServerError(e);
+      }
+    });
+
+    socket.on('markMessageRead', async (json: MarkMessageReadDto) => {
+      console.log('> MARK_MESSAGE_READ', json);
+      try {
+        const messageAfterUpdate: UpdatedMessageReadDto = await markMessageRead(json);
+        ioServer.emit('updatedMessageRead', messageAfterUpdate);
       } catch (e) {
         sendServerError(e);
       }
@@ -83,7 +107,21 @@ export function create(httpServer: http.Server) {
     });
 
     socket.on('disconnect', () => {
-      console.log('Socket.IO client disconnect...', socket.id);
+      let removedFromLookup = '';
+      try {
+        let record = `socket[${socket.id}]`;
+        if (userBySocket.has(socket.id)) {
+          const userId = userBySocket.get(socket.id);
+          record += `:userId[${userId}]`;
+          userBySocket.delete(socket.id);
+          removedFromLookup = `${record} removed from userBySocket Map`;
+        } else {
+          removedFromLookup = `${record} REMOVED EARLIER from userBySocket Map`;
+        }
+      } catch (e) {
+        removedFromLookup = `EXCEPTION userBySocket.delete(${socket.id}): ` + JSON.stringify(e);
+      }
+      console.log(`Socket.IO [${socket.id}] client disconnected, ${removedFromLookup}`);
       // handleDisconnect()
     });
 

@@ -8,6 +8,12 @@ export type MessageDto = {
   content: string;
   edited: boolean;
 
+  replyto_id?: number;
+  forwardfrom_id?: number;
+
+  persons_sent: number[];
+  persons_read: number[];
+
   room: number;
   user: number;
   user_name: string;

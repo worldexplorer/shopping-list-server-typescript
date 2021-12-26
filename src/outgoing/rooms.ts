@@ -7,7 +7,7 @@ export async function rooms(userId: number): Promise<RoomsDto> {
   const roomsForPerson = await prI.shli_m2m_room_person.findMany({
     where: cond,
     select: {
-      shli_room: true,
+      Room: true,
     },
   });
   if (!roomsForPerson.length) {
@@ -17,8 +17,8 @@ export async function rooms(userId: number): Promise<RoomsDto> {
   const roomsWithoutUsers: RoomDto[] = roomsForPerson.map(
     row =>
       <RoomDto>{
-        id: row.shli_room.id,
-        name: row.shli_room.ident,
+        id: row.Room.id,
+        name: row.Room.ident,
         users: [], //x.Rooms.map(room => room.)
       }
   );
@@ -31,7 +31,7 @@ export async function rooms(userId: number): Promise<RoomsDto> {
     where: cond2,
     select: {
       room: true,
-      shli_person: true,
+      Person: true,
     },
   });
 
@@ -45,10 +45,10 @@ export async function rooms(userId: number): Promise<RoomsDto> {
     if (room) {
       const usersInRoom: UserDto[] = personsInRooms.map(x => {
         const ret: UserDto = {
-          id: x.shli_person.id,
-          name: x.shli_person.ident,
-          phone: x.shli_person.phone,
-          email: x.shli_person.email,
+          id: x.Person.id,
+          name: x.Person.ident,
+          phone: x.Person.phone,
+          email: x.Person.email,
         };
         return ret;
       });
@@ -88,9 +88,9 @@ export function GroupBy<T, K extends keyof T>(array: T[], key: K) {
 // SELECT room.id, room.ident
 //   , string_agg(DISTINCT CONCAT(person.id, '=', person.ident, '~*/', person.phone, '~*/', person.email), '~~') AS room_users
 // FROM shli_m2m_room_person m2m
-//   INNER JOIN shli_room room ON m2m.room=room.id
+//   INNER JOIN Room room ON m2m.room=room.id
 //   INNER JOIN shli_m2m_room_person m2m_room_users ON m2m_room_users.room=room.id
-//   INNER JOIN shli_person person ON person.id=m2m_room_users.person
+//   INNER JOIN Person person ON person.id=m2m_room_users.person
 // WHERE m2m.person=${userId}
 // GROUP BY room.id, room.ident      -- , room_users
 // `;
