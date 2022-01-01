@@ -7,6 +7,7 @@ import { shli_message, shli_purchase } from '@prisma/client';
 export type GetMessagesDto = {
   room: number;
   fromMessageId: number;
+  archived: boolean;
   deviceTimezoneOffsetMinutes: number;
   currentDeviceTime: Date;
 };
@@ -14,9 +15,13 @@ export type GetMessagesDto = {
 export async function getMessages({
   room,
   fromMessageId,
+  archived,
   deviceTimezoneOffsetMinutes,
 }: GetMessagesDto): Promise<MessagesDto> {
-  const whereCondition = { room: room, deleted: 0 };
+  var whereCondition = { room: room, deleted: 0, published: 1 };
+  if (archived) {
+    whereCondition.published = 0;
+  }
   const messagesSelected = await prI.shli_message.findMany({
     include: {
       Creator: {

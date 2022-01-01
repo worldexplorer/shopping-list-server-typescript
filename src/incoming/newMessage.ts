@@ -8,11 +8,12 @@ export type NewMessageDto = {
   room: number;
   user: number;
   content: string;
+  replyto_id?: number;
   new_purchase?: NewPurchaseDto;
 };
 
 export async function newMessage(newMsg: NewMessageDto, roomUsers: number[]): Promise<MessageDto> {
-  const { room, user, content, new_purchase: purchase } = newMsg;
+  const { room, user, content, replyto_id, new_purchase: purchase } = newMsg;
 
   const messageCreated = await prI.shli_message
     .create({
@@ -21,6 +22,7 @@ export async function newMessage(newMsg: NewMessageDto, roomUsers: number[]): Pr
         person: user,
         content,
         purchase: undefined, // TODO
+        replyto_id: replyto_id,
         persons_sent: roomUsers,
       },
       include: {

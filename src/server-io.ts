@@ -14,10 +14,16 @@ import { newMessage } from './incoming/newMessage';
 import { NewMessageDto } from './incoming/newMessage';
 import { editMessage, EditMessageDto } from './incoming/editMessage';
 import {
-  markMessageRead,
-  MarkMessageReadDto,
+  markMessagesRead,
+  MarkMessagesReadDto,
   UpdatedMessageReadDto,
-} from './incoming/markMessageRead';
+} from './incoming/markMessagesRead';
+import { DeletedMessagesDto, deleteMessages, DeleteMessagesDto } from './incoming/deleteMessages';
+import {
+  ArchivedMessagesDto,
+  archiveMessages,
+  ArchiveMessagesDto,
+} from './incoming/archiveMessages';
 
 const userBySocket = new Map<string, number>();
 
@@ -61,7 +67,7 @@ export function create(httpServer: http.Server) {
     socket.on('newMessage', async (json: NewMessageDto) => {
       console.log('> NEW_MESSAGE', json);
       try {
-        const roomUsers = Array.from(userBySocket.values());
+        const roomUsers = Array.from(new Set(userBySocket.values()));
 
         const messageInserted: MessageDto = await newMessage(json, roomUsers);
         ioServer.emit('message', messageInserted);
@@ -80,11 +86,49 @@ export function create(httpServer: http.Server) {
       }
     });
 
-    socket.on('markMessageRead', async (json: MarkMessageReadDto) => {
-      console.log('> MARK_MESSAGE_READ', json);
+    socket.on('markMessagesRead', async (json: MarkMessagesReadDto) => {
+      console.log('> MARK_MESSAGES_READ', json);
       try {
-        const messageAfterUpdate: UpdatedMessageReadDto = await markMessageRead(json);
-        ioServer.emit('updatedMessageRead', messageAfterUpdate);
+        const messagesMarkedRead: UpdatedMessageReadDto[] = await markMessagesRead(json);
+        if (messagesMarkedRead.length > 0) {
+          console.log('   << UPDATED_MESSAGES_READ', JSON.stringify(messagesMarkedRead));
+          ioServer.emit('updatedMessagesRead', messagesMarkedRead);
+        } else {
+          console.log(
+            '   -- UPDATED_MESSAGES_READ ZERO NOT_SENT',
+            JSON.stringify(messagesMarkedRead)
+          );
+        }
+      } catch (e) {
+        sendServerError(e);
+      }
+    });
+
+    socket.on('archiveMessages', async (json: ArchiveMessagesDto) => {
+      console.log('> ARCHIVE_MESSAGES', json);
+      try {
+        const messagesArchived: ArchivedMessagesDto = await archiveMessages(json);
+        if (messagesArchived.messageIds.length > 0) {
+          console.log('   << ARCHIVED_MESSAGES', JSON.stringify(messagesArchived));
+          ioServer.emit('archivedMessages', messagesArchived);
+        } else {
+          console.log('   -- ARCHIVED_MESSAGES ZERO NOT_SENT', JSON.stringify(messagesArchived));
+        }
+      } catch (e) {
+        sendServerError(e);
+      }
+    });
+
+    socket.on('deleteMessages', async (json: DeleteMessagesDto) => {
+      console.log('> DELETE_MESSAGES', json);
+      try {
+        const messagesDeleted: DeletedMessagesDto = await deleteMessages(json);
+        if (messagesDeleted.messageIds.length > 0) {
+          console.log('   << DELETED_MESSAGES', JSON.stringify(messagesDeleted));
+          ioServer.emit('deletedMessages', messagesDeleted);
+        } else {
+          console.log('   -- DELETED_MESSAGES ZERO NOT_SENT', JSON.stringify(messagesDeleted));
+        }
       } catch (e) {
         sendServerError(e);
       }
@@ -95,7 +139,7 @@ export function create(httpServer: http.Server) {
         console.log('> GET_MESSAGES', json);
 
         const messagesDto = await getMessages(json);
-        console.log('   << MESSAGES', messagesDto);
+        console.log('   << MESSAGES: ', messagesDto.messages.length);
         socket.emit('messages', messagesDto);
       } catch (e) {
         sendServerError(e);
