@@ -1,8 +1,7 @@
 import { prI } from '../prisma-instance';
 import { MessageDto } from '../outgoing/messageDto';
-import { PurchaseDto } from '../outgoing/purchaseDto';
 import { NewPurchaseDto } from './newPurchaseDto';
-import { messageDaoToDto } from '../outgoing/messages';
+import { messageDaoToDto } from '../outgoing/purchaseDto';
 
 export type NewMessageDto = {
   room: number;

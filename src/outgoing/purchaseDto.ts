@@ -1,23 +1,177 @@
+import { dateShift } from '../utils/conversion.tz';
+import { shli_message, shli_purchase, shli_puritem } from '@prisma/client';
+import { MessageDto } from './messageDto';
+
 export type PurchaseDto = {
   id: number;
   date_created: Date;
   date_updated: Date;
-
   name: string;
-
   message: number;
   room: number;
-
   show_pgroup: number;
   show_price: number;
   show_qnty: number;
   show_weight: number;
-
   person_created: number;
   person_created_name: string;
   person_purchased?: number;
   person_purchased_name?: string;
-
   price_total?: number;
   weight_total?: number;
+  purItems: PuritemDto[];
 };
+
+export type PuritemDto = {
+  id: number;
+  // date_updated: Date;
+  // date_created: Date;
+  // published: number;
+  // deleted: number;
+  // manorder: number;
+  name: string;
+  qnty?: number;
+  comment?: string;
+  // Pgroup: PGroup;
+  // Product: Product;
+  pgroup_id?: number;
+  pgroup_name?: string;
+  product_id?: number;
+  product_name?: string;
+  punit_id?: number;
+  punit_name?: string;
+  punit_brief?: string;
+  punit_fpoint?: boolean;
+};
+
+// export type PGroup = {
+//   id: number;
+//   ident: String;
+// };
+
+// export type Product = {
+//   id: number;
+//   ident: String;
+// };
+
+// export type PUnit = {
+//   id: number;
+//   ident: String;
+// };
+
+export type PurchaseDao = shli_purchase & {
+  Person_created: {
+    ident: string;
+  };
+  Person_purchased: {
+    ident: string;
+  } | null;
+  Puritems: PuritemDao[];
+};
+
+export type PuritemDao = shli_puritem & {
+  Pgroup: {
+    ident: string;
+  } | null;
+  Product: {
+    ident: string;
+    punit: number | null;
+    Punit: {
+      ident: string;
+      brief: string;
+      fpoint: number;
+    } | null;
+  } | null;
+};
+
+export function purchaseNullableDaoToDtoUndefined(
+  purDao: PurchaseDao | null,
+  deviceTimezoneOffsetMinutes: number
+): PurchaseDto | undefined {
+  return purDao ? purchaseDaoToDto(purDao, deviceTimezoneOffsetMinutes) : undefined;
+}
+
+export function purchaseDaoToDto(
+  purDao: PurchaseDao,
+  deviceTimezoneOffsetMinutes: number
+): PurchaseDto {
+  const ret: PurchaseDto = {
+    id: purDao.id,
+    date_created: dateShift(purDao.date_created, deviceTimezoneOffsetMinutes),
+    date_updated: dateShift(purDao.date_updated, deviceTimezoneOffsetMinutes),
+
+    name: purDao.ident,
+
+    message: purDao.message,
+    room: purDao.room,
+
+    show_pgroup: purDao.show_pgroup,
+    show_price: purDao.show_price,
+    show_qnty: purDao.show_qnty,
+    show_weight: purDao.show_weight,
+
+    person_created: purDao.person_created,
+    person_created_name: purDao.Person_created.ident,
+    person_purchased: purDao.person_purchased || undefined,
+    person_purchased_name: purDao.Person_purchased?.ident || undefined,
+
+    price_total: purDao.price_total?.toNumber(),
+    weight_total: purDao.weight_total?.toNumber(),
+
+    purItems: purDao.Puritems.map(puritemDaoToDto),
+  };
+  return ret;
+}
+
+function puritemDaoToDto(x: PuritemDao): PuritemDto {
+  return {
+    id: x.id,
+    name: x.ident,
+    qnty: x.qnty?.toNumber() || undefined,
+    comment: x.comment || undefined,
+    pgroup_id: x.pgroup || undefined,
+    pgroup_name: x.Pgroup?.ident || undefined,
+    product_id: x.product || undefined,
+    product_name: x.Product?.ident || undefined,
+    punit_id: x.Product?.punit || undefined,
+    punit_name: x.Product?.Punit?.ident || undefined,
+    punit_brief: x.Product?.Punit?.brief || undefined,
+    punit_fpoint: (x.Product?.Punit?.fpoint || 0) == 1 ? true : false,
+  };
+}
+
+export type MessageDao = shli_message & {
+  Creator: {
+    ident: string;
+  };
+  Purchase?: PurchaseDao | null;
+};
+
+export function messageDaoToDto(
+  msgDao: MessageDao,
+  purchaseDto: PurchaseDto | undefined,
+  deviceTimezoneOffsetMinutes: number
+): MessageDto {
+  const ret: MessageDto = {
+    id: msgDao.id,
+    date_created: dateShift(msgDao.date_created, deviceTimezoneOffsetMinutes),
+    date_updated: dateShift(msgDao.date_updated, deviceTimezoneOffsetMinutes),
+
+    content: msgDao.content || '',
+    edited: msgDao.edited,
+
+    replyto_id: msgDao.replyto_id ?? undefined,
+    forwardfrom_id: msgDao.forwardfrom_id ?? undefined,
+
+    persons_sent: msgDao.persons_sent,
+    persons_read: msgDao.persons_read,
+
+    room: msgDao.room,
+    user: msgDao.person,
+    user_name: msgDao.Creator.ident,
+
+    purchaseId: msgDao.purchase ?? undefined,
+    purchase: purchaseDto,
+  };
+  return ret;
+}

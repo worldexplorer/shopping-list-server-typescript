@@ -1,7 +1,10 @@
 import { prI } from '../prisma-instance';
 import { MessageDto } from '../outgoing/messageDto';
-import { messageDaoToDto, purchaseNullableDaoToDtoUndefined } from '../outgoing/messages';
-import { PurchaseDto } from '../outgoing/purchaseDto';
+import {
+  messageDaoToDto,
+  PurchaseDto,
+  purchaseNullableDaoToDtoUndefined,
+} from '../outgoing/purchaseDto';
 
 export type EditMessageDto = {
   id: number;
@@ -34,6 +37,33 @@ export async function editMessage(editMsg: EditMessageDto): Promise<MessageDto> 
             Person_purchased: {
               select: {
                 ident: true,
+              },
+            },
+            Puritems: {
+              include: {
+                Pgroup: {
+                  select: {
+                    ident: true,
+                  },
+                },
+                Product: {
+                  include: {
+                    Punit: {
+                      select: {
+                        ident: true,
+                        brief: true,
+                        fpoint: true,
+                      },
+                    },
+                  },
+                },
+              },
+              where: {
+                published: 1,
+                deleted: 0,
+              },
+              orderBy: {
+                manorder: 'asc',
               },
             },
           },

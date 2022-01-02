@@ -139,7 +139,11 @@ export function create(httpServer: http.Server) {
         console.log('> GET_MESSAGES', json);
 
         const messagesDto = await getMessages(json);
-        console.log('   << MESSAGES: ', messagesDto.messages.length);
+        console.log(
+          '   << MESSAGES/purchase: ',
+          //  messagesDto.messages.length
+          messagesDto.messages.map(x => JSON.stringify(x.purchase))
+        );
         socket.emit('messages', messagesDto);
       } catch (e) {
         sendServerError(e);
