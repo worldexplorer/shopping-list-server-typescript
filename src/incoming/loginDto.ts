@@ -7,4 +7,6 @@ export type UserDto = {
   name: string;
   email: string;
   phone: string;
+  username: string;
+  color: string;
 };

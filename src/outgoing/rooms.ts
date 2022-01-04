@@ -49,6 +49,8 @@ export async function rooms(userId: number): Promise<RoomsDto> {
           name: x.Person.ident,
           phone: x.Person.phone,
           email: x.Person.email,
+          username: x.Person.username,
+          color: x.Person.color,
         };
         return ret;
       });

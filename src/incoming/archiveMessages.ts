@@ -3,7 +3,7 @@ import { shli_message } from '@prisma/client';
 
 export type ArchiveMessagesDto = {
   messageIds: number[];
-  archived: number;
+  archived: boolean;
   user: number;
 };
 
@@ -17,24 +17,23 @@ export async function archiveMessages(readMsg: ArchiveMessagesDto): Promise<Arch
     ','
   )}], archived[${archived}]) byUser[${user}]):`;
 
-  const publishedToFind = archived == 1 ? 1 : 0;
-  const publishedToSet = archived == 1 ? 0 : 1;
+  const archivedToFind = !archived;
 
-  const whereCondition = { id: { in: messageIds }, published: publishedToFind };
+  const whereCondition = { id: { in: messageIds }, archived: archivedToFind };
   const messagesToArchive = await prI.shli_message.findMany({
     where: whereCondition,
   });
 
   if (!messagesToArchive.length) {
     throw (
-      `${msig} No messages[${messageIds}] found (already published=${publishedToFind})` +
+      `${msig} No messages[${messageIds}] found (already archived=${archivedToFind})` +
       ` where ${JSON.stringify(whereCondition)}`
     );
   }
 
   const ret: ArchivedMessagesDto = { messageIds: [] };
   for (var messageToArchive of messagesToArchive) {
-    const alreadyArchived = messageToArchive.published == publishedToSet;
+    const alreadyArchived = messageToArchive.archived;
     if (alreadyArchived) {
       console.warn(
         `${msig} Message[${messageToArchive}] is already archived ` +
@@ -49,7 +48,7 @@ export async function archiveMessages(readMsg: ArchiveMessagesDto): Promise<Arch
           id: messageToArchive.id,
         },
         data: {
-          published: publishedToSet,
+          archived,
         },
       })
       .catch(reason => {

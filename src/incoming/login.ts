@@ -13,6 +13,8 @@ export async function login(phone: string): Promise<UserDto> {
     name: person.ident,
     email: person.email,
     phone: person.phone,
+    username: person.username,
+    color: person.color,
   };
 
   return ret;

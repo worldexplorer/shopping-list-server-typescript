@@ -7,6 +7,8 @@ export const mockUserBob: UserDto = {
   name: 'Bob',
   email: 'first@user',
   phone: '+1-555-5555',
+  username: '@bob',
+  color: 'yellow',
 };
 
 export const mockUserAlice: UserDto = {
@@ -14,6 +16,8 @@ export const mockUserAlice: UserDto = {
   name: 'Alice',
   email: 'second@user',
   phone: '+1-555-6666',
+  username: '@alice',
+  color: 'green',
 };
 
 export const mockRoom: RoomDto = {

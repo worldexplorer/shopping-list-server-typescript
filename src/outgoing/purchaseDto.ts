@@ -9,12 +9,15 @@ export type PurchaseDto = {
   name: string;
   message: number;
   room: number;
-  show_pgroup: number;
-  show_price: number;
-  show_qnty: number;
-  show_weight: number;
+  show_pgroup: boolean;
+  show_price: boolean;
+  show_qnty: boolean;
+  show_weight: boolean;
+  copiedfrom_id?: number;
   person_created: number;
   person_created_name: string;
+  purchased: boolean;
+  persons_can_edit: number[];
   person_purchased?: number;
   person_purchased_name?: string;
   price_total?: number;
@@ -31,6 +34,12 @@ export type PuritemDto = {
   // manorder: number;
   name: string;
   qnty?: number;
+
+  bought: boolean;
+  bought_qnty?: number;
+  bought_price?: number;
+  bought_weight?: number;
+
   comment?: string;
   // Pgroup: PGroup;
   // Product: Product;
@@ -79,7 +88,7 @@ export type PuritemDao = shli_puritem & {
     Punit: {
       ident: string;
       brief: string;
-      fpoint: number;
+      fpoint: boolean;
     } | null;
   } | null;
 };
@@ -112,6 +121,8 @@ export function purchaseDaoToDto(
 
     person_created: purDao.person_created,
     person_created_name: purDao.Person_created.ident,
+    persons_can_edit: purDao.persons_can_edit,
+    purchased: purDao.purchased,
     person_purchased: purDao.person_purchased || undefined,
     person_purchased_name: purDao.Person_purchased?.ident || undefined,
 
@@ -128,6 +139,10 @@ function puritemDaoToDto(x: PuritemDao): PuritemDto {
     id: x.id,
     name: x.ident,
     qnty: x.qnty?.toNumber() || undefined,
+    bought: x.bought,
+    bought_qnty: x.bought_qnty?.toNumber() || undefined,
+    bought_price: x.bought_price?.toNumber() || undefined,
+    bought_weight: x.bought_weight?.toNumber() || undefined,
     comment: x.comment || undefined,
     pgroup_id: x.pgroup || undefined,
     pgroup_name: x.Pgroup?.ident || undefined,
@@ -136,7 +151,7 @@ function puritemDaoToDto(x: PuritemDao): PuritemDto {
     punit_id: x.Product?.punit || undefined,
     punit_name: x.Product?.Punit?.ident || undefined,
     punit_brief: x.Product?.Punit?.brief || undefined,
-    punit_fpoint: (x.Product?.Punit?.fpoint || 0) == 1 ? true : false,
+    punit_fpoint: x.Product?.Punit?.fpoint || false,
   };
 }
 

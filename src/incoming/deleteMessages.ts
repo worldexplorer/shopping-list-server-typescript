@@ -14,7 +14,7 @@ export async function deleteMessages(readMsg: DeleteMessagesDto): Promise<Delete
   const { messageIds, user } = readMsg;
   const msig = `deleteMessages(messageIds[${messageIds.join(',')}]) byUser[${user}]):`;
 
-  const whereCondition = { id: { in: messageIds }, deleted: 0 };
+  const whereCondition = { id: { in: messageIds }, deleted: false };
   const messagesToDelete = await prI.shli_message.findMany({
     where: whereCondition,
   });
@@ -28,7 +28,7 @@ export async function deleteMessages(readMsg: DeleteMessagesDto): Promise<Delete
 
   const ret: DeletedMessagesDto = { messageIds: [] };
   for (var messageToDelete of messagesToDelete) {
-    const alreadyDeleted = messageToDelete.deleted == 1;
+    const alreadyDeleted = messageToDelete.deleted == true;
     if (alreadyDeleted) {
       console.warn(
         `${msig} Message[${messageToDelete}] is already deleted ` +
@@ -43,7 +43,7 @@ export async function deleteMessages(readMsg: DeleteMessagesDto): Promise<Delete
           id: messageToDelete.id,
         },
         data: {
-          deleted: 1,
+          deleted: true,
         },
       })
       .catch(reason => {

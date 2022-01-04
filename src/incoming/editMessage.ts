@@ -12,13 +12,16 @@ export type EditMessageDto = {
 };
 
 export async function editMessage(editMsg: EditMessageDto): Promise<MessageDto> {
+  const { id, content } = editMsg;
+
   const messageEdited = await prI.shli_message
     .update({
       where: {
-        id: editMsg.id,
+        id,
       },
       data: {
-        content: editMsg.content,
+        ident: content.substring(0, 20),
+        content,
         edited: true,
       },
       include: {
@@ -59,8 +62,8 @@ export async function editMessage(editMsg: EditMessageDto): Promise<MessageDto> 
                 },
               },
               where: {
-                published: 1,
-                deleted: 0,
+                published: true,
+                deleted: false,
               },
               orderBy: {
                 manorder: 'asc',

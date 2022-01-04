@@ -16,10 +16,7 @@ export async function getMessages({
   archived,
   deviceTimezoneOffsetMinutes,
 }: GetMessagesDto): Promise<MessagesDto> {
-  var whereCondition = { room: room, deleted: 0, published: 1 };
-  if (archived) {
-    whereCondition.published = 0;
-  }
+  var whereCondition = { room: room, deleted: false, archived: archived };
   const messagesSelected = await prI.shli_message.findMany({
     include: {
       Creator: {
@@ -59,8 +56,8 @@ export async function getMessages({
               },
             },
             where: {
-              published: 1,
-              deleted: 0,
+              published: true,
+              deleted: false,
             },
             orderBy: {
               manorder: 'asc',

@@ -17,7 +17,7 @@ export async function markMessagesRead(
   const { messageIds, user } = readMsg;
   const msig = `markMessageRead(messageIds[${messageIds.join(',')}] byUser[${user}]):`;
 
-  const whereCondition = { id: { in: messageIds }, deleted: 0 };
+  const whereCondition = { id: { in: messageIds }, deleted: false };
   const messagesToMarkReadByOneUser = await prI.shli_message.findMany({
     where: whereCondition,
   });

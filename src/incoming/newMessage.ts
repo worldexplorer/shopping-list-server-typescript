@@ -19,6 +19,7 @@ export async function newMessage(newMsg: NewMessageDto, roomUsers: number[]): Pr
       data: {
         room,
         person: user,
+        ident: content.substring(0, 20),
         content,
         purchase: undefined, // TODO
         replyto_id: replyto_id,
