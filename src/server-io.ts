@@ -9,7 +9,7 @@ import { LoginDto, login, UserDto } from './incoming/login';
 
 import { rooms } from './outgoing/rooms';
 import { GetMessagesDto, getMessages, selectMessage } from './outgoing/messages';
-import { newMessageWithoutPurchase } from './incoming/newMessage';
+import { newMessage } from './incoming/newMessage';
 import { NewMessageDto } from './incoming/newMessage';
 import { editMessage, EditMessageDto, updateMessageSetEditedTrue } from './incoming/editMessage';
 import {
@@ -143,7 +143,7 @@ export function create(httpServer: http.Server) {
       try {
         const [userIdCreated, roomUserIds] = isUserInRoom(`newMessage()`, socket.id, json.room);
 
-        const messageInserted: MessageDto = await newMessageWithoutPurchase(
+        const messageInserted: MessageDto = await newMessage(
           json,
           userIdCreated,
           roomUserIds
@@ -248,11 +248,11 @@ export function create(httpServer: http.Server) {
           room: json.room,
           content: '[' + json.name.substring(0, 20) + ']',
           replyto_id: json.replyto_id,
-          // new_purchase: purchaseInserted,
+          purchase: purchaseInserted.id,
         };
 
         console.log(`    2/4 inserting newMessage`, jsonNewMessage);
-        const messageInserted: MessageDto = await newMessageWithoutPurchase(
+        const messageInserted: MessageDto = await newMessage(
           jsonNewMessage,
           userIdCreated,
           roomUserIds
@@ -261,11 +261,12 @@ export function create(httpServer: http.Server) {
         console.log(
           `    3/4 updating purchase[${purchaseInserted.id}].message=${messageInserted.id}`
         );
-        const messageIdUpdated = updateMessageIdInPurchase(purchaseInserted.id, messageInserted.id);
-
-        console.log(
-          `    4/4 updating purchase[${purchaseInserted.id}].message=${messageInserted.id}`
+        const messageIdUpdated = await updateMessageIdInPurchase(
+          purchaseInserted.id,
+          messageInserted.id
         );
+
+        console.log(`    4/4 selecting message=${messageInserted.id}`);
         const messageInsertedUpdatedWithPurchase: MessageDto = await selectMessage(
           messageInserted.id
         );

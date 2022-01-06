@@ -6,15 +6,15 @@ export type NewMessageDto = {
   room: number;
   content: string;
   replyto_id?: number;
-  // new_purchase?: PurchaseDto;
+  purchase?: number;
 };
 
-export async function newMessageWithoutPurchase(
-  newMsgWithoutPurchase: NewMessageDto,
+export async function newMessage(
+  newMsg: NewMessageDto,
   userIdCreated: number,
   roomUserIds: number[]
 ): Promise<MessageDto> {
-  const { room, content, replyto_id } = newMsgWithoutPurchase;
+  const { room, content, replyto_id, purchase } = newMsg;
 
   const uniqueUserIds: number[] = Array.from(new Set(roomUserIds));
 
@@ -25,8 +25,8 @@ export async function newMessageWithoutPurchase(
         person: userIdCreated,
         ident: content.substring(0, 20),
         content,
-        purchase: undefined, // TODO
-        replyto_id: replyto_id,
+        replyto_id,
+        purchase,
         persons_sent: uniqueUserIds,
       },
       include: {
