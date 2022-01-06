@@ -1,4 +1,4 @@
-import { UserDto } from '../incoming/loginDto';
+import { UserDto } from '../incoming/login';
 
 export type RoomDto = {
   id: number;

@@ -1,5 +1,5 @@
 import { RoomDto, RoomsDto } from '../outgoing/roomsDto';
-import { UserDto } from '../incoming/loginDto';
+import { UserDto } from '../incoming/login';
 import { MessagesDto } from '../outgoing/messageDto';
 
 export const mockUserBob: UserDto = {
