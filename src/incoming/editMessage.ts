@@ -5,9 +5,11 @@ import {
   PurchaseDto,
   purchaseNullableDaoToDtoUndefined,
 } from '../outgoing/purchaseDto';
+import { shli_message } from '@prisma/client';
 
 export type EditMessageDto = {
   id: number;
+  room: number;
   content: string;
 };
 
@@ -84,4 +86,21 @@ export async function editMessage(editMsg: EditMessageDto): Promise<MessageDto> 
   );
   const ret: MessageDto = messageDaoToDto(messageEdited, purDto, deviceTimezoneOffsetMinutes);
   return ret;
+}
+
+export async function updateMessageSetEditedTrue(messageId: number): Promise<shli_message> {
+  const messageEdited = await prI.shli_message
+    .update({
+      where: {
+        id: messageId,
+      },
+      data: {
+        edited: true,
+      },
+    })
+    .catch(reason => {
+      throw reason;
+    });
+
+  return messageEdited;
 }

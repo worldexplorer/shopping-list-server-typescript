@@ -5,14 +5,13 @@ import { runConfig, URL } from './server.config';
 import { PrismaInit } from './prisma-instance';
 
 import { MessageDto } from './outgoing/messageDto';
-import { login } from './incoming/login';
-import { LoginDto } from './incoming/loginDto';
+import { LoginDto, login, UserDto } from './incoming/login';
 
 import { rooms } from './outgoing/rooms';
-import { GetMessagesDto, getMessages } from './outgoing/messages';
-import { newMessage } from './incoming/newMessage';
+import { GetMessagesDto, getMessages, selectMessage } from './outgoing/messages';
+import { newMessageWithoutPurchase } from './incoming/newMessage';
 import { NewMessageDto } from './incoming/newMessage';
-import { editMessage, EditMessageDto } from './incoming/editMessage';
+import { editMessage, EditMessageDto, updateMessageSetEditedTrue } from './incoming/editMessage';
 import {
   markMessagesRead,
   MarkMessagesReadDto,
@@ -24,8 +23,21 @@ import {
   archiveMessages,
   ArchiveMessagesDto,
 } from './incoming/archiveMessages';
+import { updateMessageIdInPurchase, newPurchase, NewPurchaseDto } from './incoming/newPurchase';
+import { PurchaseDto } from './outgoing/purchaseDto';
+import { RoomsDto } from './outgoing/roomsDto';
+import { EditPurchaseDto, editPurchase } from './incoming/editPurchase';
+import { shli_message, shli_purchase } from '@prisma/client';
 
-const userBySocket = new Map<string, number>();
+type SocketUserRoom = {
+  socketId: string;
+  userId: number;
+  roomIds: number[];
+};
+
+const userBySocket = new Map<string, SocketUserRoom>();
+
+const usersByRoom = new Map<number, number[]>();
 
 export function create(httpServer: http.Server) {
   const ioServer = new socketio.Server(httpServer);
@@ -47,16 +59,29 @@ export function create(httpServer: http.Server) {
       try {
         console.log('> LOGIN', json);
 
-        const userDto = await login(json.phone);
+        const userDto: UserDto = await login(json.phone);
+        const roomsDto: RoomsDto = await rooms(userDto.id);
+        for (const room of roomsDto.rooms) {
+          const users: UserDto[] = room.users;
+          const userIds: number[] = users.map(x => x.id);
+          usersByRoom.set(room.id, userIds);
+        }
 
-        userBySocket.set(socket.id, userDto.id);
-        const record = `   socket[${socket.id}]:userId[${userDto.id}]`;
+        const userInfo: SocketUserRoom = {
+          socketId: socket.id,
+          userId: userDto.id,
+          roomIds: roomsDto.rooms.map(x => x.id),
+        };
+
+        userBySocket.set(socket.id, userInfo);
+        const record = `   socket[${socket.id}]:userId[${
+          userInfo.userId
+        }]:rooms[${userInfo.roomIds.join(',')}]`;
         console.log(`${record} ADDED to userBySocket Map`);
 
         console.log('   << USER', userDto);
         socket.emit('user', userDto);
 
-        const roomsDto = await rooms(userDto.id);
         console.log('   << ROOMS', JSON.stringify(roomsDto));
         socket.emit('rooms', roomsDto);
       } catch (e) {
@@ -64,12 +89,65 @@ export function create(httpServer: http.Server) {
       }
     });
 
+    function isUserInRoom(
+      msig: string,
+      socketId: string,
+      roomId: number
+    ): [number, number[], string] {
+      msig += `:socket[${socketId}]`;
+
+      const userInfo: SocketUserRoom | undefined = userBySocket.get(socketId);
+      if (!userInfo) {
+        throw `NO_USER_FOR_SOCKET[${msig}]`;
+      }
+      const userId = userInfo.userId;
+      msig += `:userId[${userId}]`;
+
+      const roomUserIds: number[] | undefined = usersByRoom.get(roomId);
+      if (!roomUserIds) {
+        throw `NO_ROOMS_FOR_USER[${msig}]`;
+      }
+
+      return [userId, roomUserIds, msig];
+    }
+
+    async function canUserEdit(
+      msig: string,
+      socketId: string,
+      roomId: number,
+      messageId: number,
+      purchaseId?: number
+    ): Promise<[number, number[], string]> {
+      const [userId, roomUserIds, msig2] = isUserInRoom(msig, socketId, roomId);
+      const msig3 = msig2 + `:messageId[${messageId}]:purchaseId[${purchaseId}]`;
+
+      const messageWithPurchase: MessageDto = await selectMessage(messageId);
+      if (messageWithPurchase.user !== userId) {
+        throw `CAN_NOT_EDIT_OTHER_PERSONS_MESSAGE[${msig3}]`;
+      }
+
+      if (purchaseId) {
+        if (!messageWithPurchase.purchase) {
+          throw `NO_PURCHASE_FOUND_IN_MESSAGE[${msig3}]`;
+        }
+
+        if (!messageWithPurchase.purchase.persons_can_edit?.includes(userId)) {
+          throw `NOT_ALLOWED_TO_EDIT_PURCHASE[${msig3}]`;
+        }
+      }
+
+      return [userId, roomUserIds, msig];
+    }
     socket.on('newMessage', async (json: NewMessageDto) => {
       console.log('> NEW_MESSAGE', json);
       try {
-        const roomUsers = Array.from(new Set(userBySocket.values()));
+        const [userIdCreated, roomUserIds] = isUserInRoom(`newMessage()`, socket.id, json.room);
 
-        const messageInserted: MessageDto = await newMessage(json, roomUsers);
+        const messageInserted: MessageDto = await newMessageWithoutPurchase(
+          json,
+          userIdCreated,
+          roomUserIds
+        );
         ioServer.emit('message', messageInserted);
       } catch (e) {
         sendServerError(e);
@@ -79,6 +157,8 @@ export function create(httpServer: http.Server) {
     socket.on('editMessage', async (json: EditMessageDto) => {
       console.log('> EDIT_MESSAGE', json);
       try {
+        const [userId] = await canUserEdit(`editMessage()`, socket.id, json.room, json.id);
+
         const messageEdited: MessageDto = await editMessage(json);
         ioServer.emit('message', messageEdited);
       } catch (e) {
@@ -145,6 +225,86 @@ export function create(httpServer: http.Server) {
           messagesDto.messages.map(x => JSON.stringify(x.purchase))
         );
         socket.emit('messages', messagesDto);
+      } catch (e) {
+        sendServerError(e);
+      }
+    });
+
+    socket.on('newPurchase', async (json: NewPurchaseDto) => {
+      console.log('> NEW_PURCHASE', json);
+      try {
+        const [userIdCreated, roomUserIds] = isUserInRoom(`newPurchase()`, socket.id, json.room);
+
+        let log = '';
+        if (json.persons_can_edit == undefined) {
+          json.persons_can_edit = roomUserIds;
+          log += ` (added persons_can_edit=[${json.persons_can_edit.join(',')}])`;
+        }
+        console.log(`    1/4 inserting newPurchase${log}`, json);
+        const purchaseInserted: shli_purchase = await newPurchase(json, userIdCreated);
+
+        // copypaste from socket.on('newMessage'):
+        const jsonNewMessage: NewMessageDto = {
+          room: json.room,
+          content: '[' + json.name.substring(0, 20) + ']',
+          replyto_id: json.replyto_id,
+          // new_purchase: purchaseInserted,
+        };
+
+        console.log(`    2/4 inserting newMessage`, jsonNewMessage);
+        const messageInserted: MessageDto = await newMessageWithoutPurchase(
+          jsonNewMessage,
+          userIdCreated,
+          roomUserIds
+        );
+
+        console.log(
+          `    3/4 updating purchase[${purchaseInserted.id}].message=${messageInserted.id}`
+        );
+        const messageIdUpdated = updateMessageIdInPurchase(purchaseInserted.id, messageInserted.id);
+
+        console.log(
+          `    4/4 updating purchase[${purchaseInserted.id}].message=${messageInserted.id}`
+        );
+        const messageInsertedUpdatedWithPurchase: MessageDto = await selectMessage(
+          messageInserted.id
+        );
+
+        console.log(
+          `   << MESSAGE/newPurchase[${purchaseInserted.id}]:messageIdUpdated[${messageIdUpdated}]`,
+          JSON.stringify(messageInsertedUpdatedWithPurchase)
+        );
+        ioServer.emit('message', messageInsertedUpdatedWithPurchase);
+      } catch (e) {
+        sendServerError(e);
+      }
+    });
+
+    socket.on('editPurchase', async (json: EditPurchaseDto) => {
+      console.log('> EDIT_PURCHASE', json);
+      try {
+        const [userId] = await canUserEdit(
+          `editPurchase()`,
+          socket.id,
+          json.room,
+          json.message,
+          json.id
+        );
+
+        console.log(`    1/3 updating purchase`, json);
+        const purchaseEdited: shli_purchase = await editPurchase(json);
+
+        console.log(`    2/3 updating message[${json.message}].edited=true`);
+        const messageEdited: shli_message = await updateMessageSetEditedTrue(json.message);
+
+        console.log(`    3/3 selecting message[${json.message}]`);
+        const messageWithPurchaseEdited: MessageDto = await selectMessage(json.message);
+
+        console.log(
+          `   << MESSAGE/purchaseEdited[${purchaseEdited.id}]:messageIdUpdated[${messageEdited.id}]`,
+          messageWithPurchaseEdited.purchase
+        );
+        ioServer.emit('message', messageWithPurchaseEdited);
       } catch (e) {
         sendServerError(e);
       }

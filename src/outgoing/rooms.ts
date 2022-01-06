@@ -1,6 +1,6 @@
-import { RoomsDto, RoomDto } from './roomsDto';
-import { UserDto } from '../incoming/loginDto';
 import { prI } from '../prisma-instance';
+import { UserDto } from '../incoming/login';
+import { RoomsDto, RoomDto } from './roomsDto';
 
 export async function rooms(userId: number): Promise<RoomsDto> {
   const cond = { person: userId };

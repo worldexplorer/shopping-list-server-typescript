@@ -1,27 +1,34 @@
 import { dateShift } from '../utils/conversion.tz';
-import { shli_message, shli_purchase, shli_puritem } from '@prisma/client';
+import { Prisma, shli_message, shli_purchase, shli_puritem } from '@prisma/client';
 import { MessageDto } from './messageDto';
+
 
 export type PurchaseDto = {
   id: number;
   date_created: Date;
   date_updated: Date;
   name: string;
+
   message: number;
   room: number;
+
   show_pgroup: boolean;
   show_price: boolean;
   show_qnty: boolean;
   show_weight: boolean;
+
   copiedfrom_id?: number;
+
   person_created: number;
   person_created_name: string;
-  purchased: boolean;
   persons_can_edit: number[];
+
+  purchased: boolean;
   person_purchased?: number;
   person_purchased_name?: string;
   price_total?: number;
   weight_total?: number;
+
   purItems: PuritemDto[];
 };
 

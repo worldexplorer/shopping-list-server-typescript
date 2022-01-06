@@ -1,29 +1,33 @@
 import { prI } from '../prisma-instance';
 import { MessageDto } from '../outgoing/messageDto';
-import { NewPurchaseDto } from './newPurchaseDto';
-import { messageDaoToDto } from '../outgoing/purchaseDto';
+import { messageDaoToDto, PurchaseDto } from '../outgoing/purchaseDto';
 
 export type NewMessageDto = {
   room: number;
-  user: number;
   content: string;
   replyto_id?: number;
-  new_purchase?: NewPurchaseDto;
+  // new_purchase?: PurchaseDto;
 };
 
-export async function newMessage(newMsg: NewMessageDto, roomUsers: number[]): Promise<MessageDto> {
-  const { room, user, content, replyto_id, new_purchase: purchase } = newMsg;
+export async function newMessageWithoutPurchase(
+  newMsgWithoutPurchase: NewMessageDto,
+  userIdCreated: number,
+  roomUserIds: number[]
+): Promise<MessageDto> {
+  const { room, content, replyto_id } = newMsgWithoutPurchase;
+
+  const uniqueUserIds: number[] = Array.from(new Set(roomUserIds));
 
   const messageCreated = await prI.shli_message
     .create({
       data: {
         room,
-        person: user,
+        person: userIdCreated,
         ident: content.substring(0, 20),
         content,
         purchase: undefined, // TODO
         replyto_id: replyto_id,
-        persons_sent: roomUsers,
+        persons_sent: uniqueUserIds,
       },
       include: {
         Creator: {
