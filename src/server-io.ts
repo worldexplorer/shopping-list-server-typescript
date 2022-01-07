@@ -28,6 +28,7 @@ import { PurchaseDto } from './outgoing/purchaseDto';
 import { RoomsDto } from './outgoing/roomsDto';
 import { EditPurchaseDto, editPurchase } from './incoming/editPurchase';
 import { shli_message, shli_purchase } from '@prisma/client';
+import { fillPurchase, FillPurchaseDto } from './incoming/fillPurchase';
 
 type SocketUserRoom = {
   socketId: string;
@@ -143,11 +144,7 @@ export function create(httpServer: http.Server) {
       try {
         const [userIdCreated, roomUserIds] = isUserInRoom(`newMessage()`, socket.id, json.room);
 
-        const messageInserted: MessageDto = await newMessage(
-          json,
-          userIdCreated,
-          roomUserIds
-        );
+        const messageInserted: MessageDto = await newMessage(json, userIdCreated, roomUserIds);
         ioServer.emit('message', messageInserted);
       } catch (e) {
         sendServerError(e);
@@ -306,6 +303,38 @@ export function create(httpServer: http.Server) {
           messageWithPurchaseEdited.purchase
         );
         ioServer.emit('message', messageWithPurchaseEdited);
+      } catch (e) {
+        sendServerError(e);
+      }
+    });
+
+    socket.on('fillPurchase', async (json: FillPurchaseDto) => {
+      console.log('> FILL_PURCHASE');
+      try {
+        const [userId] = await canUserEdit(
+          `fillPurchase()`,
+          socket.id,
+          json.room,
+          json.message,
+          json.id
+        );
+
+        console.log(`    1/2 filling purchase`);
+        const purchaseEdited: shli_purchase | undefined = await fillPurchase(json);
+
+        if (!purchaseEdited) {
+          const msg = `INVOKED_IN_VAIN__PR_FIX_COMPARE() //fillPurchase(${json.id})`;
+          console.error(`        ${msg}`, json);
+          // throw msg;
+        }
+
+        console.log(`    2/2 selecting message[${json.message}]`);
+        const messageWithPurchaseFilled: MessageDto = await selectMessage(json.message);
+
+        console.log(
+          `   << MESSAGE/purchaseFilled[${json.id}]:messageId[${messageWithPurchaseFilled.id}]`
+        );
+        ioServer.emit('message', messageWithPurchaseFilled);
       } catch (e) {
         sendServerError(e);
       }
