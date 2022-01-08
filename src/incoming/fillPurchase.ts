@@ -36,7 +36,8 @@ type PurItemForComparison = {
 };
 
 export async function fillPurchase(
-  fillPurchase: FillPurchaseDto
+  fillPurchase: FillPurchaseDto,
+  sendServerError: (error: any) => unknown
 ): Promise<shli_purchase | undefined> {
   const { id, purchased, price_total, weight_total, purItemsFilled } = fillPurchase;
 
@@ -89,7 +90,7 @@ export async function fillPurchase(
     }
 
     const counter = `${i}/${purItemsFilled.length - 1}`;
-    const msig = `        purItemFilled[${counter}].update(${purItemId}) `;
+    const msig = `purItemFilled[${counter}].update(${purItemId}) `;
 
     const { bought, bought_qnty, bought_price, bought_weight, comment } = purItem;
     const purItemUpdated: PurItemForComparison = await prI.shli_puritem
@@ -120,8 +121,13 @@ export async function fillPurchase(
     const changes = whatChanged(sameInDb, purItemUpdated);
     const changesPrinted =
       changes.length == 0 ? 'UPDATED_IN_VAIN__OR_FIX_COMPARE()_FUNCTION' : changes;
-    console.log(`${msig}: ${changesPrinted}`);
-    recordsUpdated++;
+    console.log(`        ${msig}: ${changesPrinted}`);
+
+    if (changes.length == 0) {
+      sendServerError(`${msig}: ${changesPrinted}`);
+    } else {
+      recordsUpdated++;
+    }
   }
 
   return recordsUpdated > 0 ? purchaseFilled : undefined;

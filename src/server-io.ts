@@ -24,7 +24,6 @@ import {
   ArchiveMessagesDto,
 } from './incoming/archiveMessages';
 import { updateMessageIdInPurchase, newPurchase, NewPurchaseDto } from './incoming/newPurchase';
-import { PurchaseDto } from './outgoing/purchaseDto';
 import { RoomsDto } from './outgoing/roomsDto';
 import { EditPurchaseDto, editPurchase } from './incoming/editPurchase';
 import { shli_message, shli_purchase } from '@prisma/client';
@@ -47,8 +46,8 @@ export function create(httpServer: http.Server) {
     console.log('Socket.IO client connected', socket.id);
 
     const sendServerError = (reason: any) => {
-      console.log('   << ERROR', reason);
-      socket.emit('error', reason);
+      console.log('   << ERROR', `${reason}`);
+      socket.emit('error', `${reason}`);
     };
 
     socket.on('typing', (data: any) => {
@@ -320,11 +319,15 @@ export function create(httpServer: http.Server) {
         );
 
         console.log(`    1/2 filling purchase`);
-        const purchaseEdited: shli_purchase | undefined = await fillPurchase(json);
+        const purchaseEdited: shli_purchase | undefined = await fillPurchase(json, sendServerError);
 
         if (!purchaseEdited) {
           const msg = `INVOKED_IN_VAIN__PR_FIX_COMPARE() //fillPurchase(${json.id})`;
-          console.error(`        ${msg}`, json);
+          console.error(
+            `        ${msg}`
+            //, json
+          );
+          sendServerError(msg);
           // throw msg;
         }
 
