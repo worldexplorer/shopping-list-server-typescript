@@ -11,8 +11,9 @@ export type EditPurchaseDto = {
   message: number;
 
   show_pgroup: boolean;
-  show_price: boolean;
+  show_serno: boolean;
   show_qnty: boolean;
+  show_price: boolean;
   show_weight: boolean;
 
   persons_can_edit: number[];
@@ -26,8 +27,9 @@ export async function editPurchase(editPurchase: EditPurchaseDto): Promise<shli_
     name,
     room,
     show_pgroup,
-    show_price,
+    show_serno,
     show_qnty,
+    show_price,
     show_weight,
     persons_can_edit,
     purItems,
@@ -45,8 +47,9 @@ export async function editPurchase(editPurchase: EditPurchaseDto): Promise<shli_
       data: {
         ident: name,
         show_pgroup,
-        show_price,
+        show_serno,
         show_qnty,
+        show_price,
         show_weight,
         persons_can_edit,
       },
@@ -65,6 +68,12 @@ export async function editPurchase(editPurchase: EditPurchaseDto): Promise<shli_
   for (let i = 0; i < purItems.length; i++) {
     const purItem: PurItemDto = purItems[i];
     const purItemId = purItem.id == 0 ? undefined : purItem.id;
+
+    const pgroup_id: number | null = purchaseEdited.show_pgroup ? purItem.pgroup_id ?? null : null;
+
+    const product_id: number | null =
+      purchaseEdited.show_pgroup ? purItem.product_id  ?? null: null;
+
     await prI.shli_puritem
       .upsert({
         where: {
@@ -83,8 +92,8 @@ export async function editPurchase(editPurchase: EditPurchaseDto): Promise<shli_
           ident: purItem.name,
           comment: purItem.comment,
           qnty: purItem.qnty,
-          pgroup: purItem.pgroup_id,
-          product: purItem.product_id,
+          pgroup: pgroup_id,
+          product: product_id,
         },
       })
       .catch(reason => {

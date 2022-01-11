@@ -122,9 +122,6 @@ export function create(httpServer: http.Server) {
       const msig3 = msig2 + `:messageId[${messageId}]:purchaseId[${purchaseId}]`;
 
       const messageWithPurchase: MessageDto = await selectMessage(messageId);
-      if (messageWithPurchase.user !== userId) {
-        throw `CAN_NOT_EDIT_OTHER_PERSONS_MESSAGE[${msig3}]`;
-      }
 
       if (purchaseId) {
         if (!messageWithPurchase.purchase) {
@@ -133,6 +130,10 @@ export function create(httpServer: http.Server) {
 
         if (!messageWithPurchase.purchase.persons_can_edit?.includes(userId)) {
           throw `NOT_ALLOWED_TO_EDIT_PURCHASE[${msig3}]`;
+        }
+      } else {
+        if (messageWithPurchase.user !== userId) {
+          throw `CAN_NOT_EDIT_OTHER_PERSONS_MESSAGE[${msig3}]`;
         }
       }
 
@@ -353,7 +354,7 @@ export function create(httpServer: http.Server) {
         let record = `socket[${socket.id}]`;
         if (userBySocket.has(socket.id)) {
           const userId = userBySocket.get(socket.id);
-          record += `:userId[${userId}]`;
+          record += `:userId[${JSON.stringify(userId)}]`;
           userBySocket.delete(socket.id);
           removedFromLookup = `${record} removed from userBySocket Map`;
         } else {

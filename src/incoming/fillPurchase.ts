@@ -75,11 +75,16 @@ export async function fillPurchase(
     const purItem: FillPurItemDto = purItemsFilled[i];
     const purItemId = purItem.id;
 
+    const counter = `${i}/${purItemsFilled.length - 1}`;
+    const msig = `purItemFilled[${counter}].update(${purItemId}) `;
+
     const sameInDb: PurItemForComparison | undefined = purchaseFilled.Puritems.find(
       x => x.id === purItemId
     );
     if (!sameInDb) {
-      throw `purchaseFilled.Puritems.find(x => x.id === purItemId)`;
+      // throw `purchaseFilled.Puritems.find(x => x.id === ${purItemId})`;
+      console.log(`new PurItem should not have been inserted`, purItem);
+      continue;
     }
 
     // const changed = compare(purItem, sameInDb);
@@ -88,9 +93,6 @@ export async function fillPurchase(
     if (!changed) {
       continue;
     }
-
-    const counter = `${i}/${purItemsFilled.length - 1}`;
-    const msig = `purItemFilled[${counter}].update(${purItemId}) `;
 
     const { bought, bought_qnty, bought_price, bought_weight, comment } = purItem;
     const purItemUpdated: PurItemForComparison = await prI.shli_puritem

@@ -169,14 +169,14 @@ model shli_purchase {
   person_purchased Int?
   price_total      Decimal?       @db.Decimal(7, 2)
   weight_total     Decimal?       @db.Decimal(7, 2)
-  MessageRoom      shli_room      @relation("shli_purchase_messageToshli_room", fields: [message], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  show_serno       Boolean        @default(false)
   Person_created   shli_person    @relation("shli_personToshli_purchase_person_created", fields: [person_created], references: [id], onDelete: NoAction, onUpdate: NoAction)
   Person_purchased shli_person?   @relation("shli_personToshli_purchase_person_purchased", fields: [person_purchased], references: [id], onDelete: NoAction, onUpdate: NoAction)
   PurchaseRoom     shli_room      @relation("shli_purchase_roomToshli_room", fields: [room], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  Message          shli_message[]
   Pgroups          shli_pgroup[]
   Products         shli_product[]
   Puritems         shli_puritem[]
+  shli_message     shli_message[]
 }
 
 model shli_puritem {
@@ -221,7 +221,6 @@ model shli_room {
   Messages            shli_message[]
   Pgroups             shli_pgroup[]
   Products            shli_product[]
-  PurchasesViaMessage shli_purchase[]        @relation("shli_purchase_messageToshli_room")
   PurchasesViaRoom    shli_purchase[]        @relation("shli_purchase_roomToshli_room")
   Puritems            shli_puritem[]
 }

@@ -1,7 +1,6 @@
 import { dateShift } from '../utils/conversion.tz';
-import { Prisma, shli_message, shli_purchase, shli_puritem } from '@prisma/client';
+import { shli_message, shli_purchase, shli_puritem } from '@prisma/client';
 import { MessageDto } from './messageDto';
-
 
 export type PurchaseDto = {
   id: number;
@@ -13,8 +12,9 @@ export type PurchaseDto = {
   room: number;
 
   show_pgroup: boolean;
-  show_price: boolean;
+  show_serno: boolean;
   show_qnty: boolean;
+  show_price: boolean;
   show_weight: boolean;
 
   copiedfrom_id?: number;
@@ -122,8 +122,9 @@ export function purchaseDaoToDto(
     room: purDao.room,
 
     show_pgroup: purDao.show_pgroup,
-    show_price: purDao.show_price,
+    show_serno: purDao.show_serno,
     show_qnty: purDao.show_qnty,
+    show_price: purDao.show_price,
     show_weight: purDao.show_weight,
 
     person_created: purDao.person_created,
