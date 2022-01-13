@@ -15,7 +15,8 @@ export type EditPurchaseDto = {
   show_qnty: boolean;
   show_price: boolean;
   show_weight: boolean;
-  show_threestate: boolean;
+  show_state_unknown: boolean;
+  show_state_stop: boolean;
 
   persons_can_edit: number[];
 
@@ -32,7 +33,8 @@ export async function editPurchase(editPurchase: EditPurchaseDto): Promise<shli_
     show_qnty,
     show_price,
     show_weight,
-    show_threestate,
+    show_state_unknown,
+    show_state_stop,
     persons_can_edit,
     purItems,
   } = editPurchase;
@@ -55,7 +57,8 @@ export async function editPurchase(editPurchase: EditPurchaseDto): Promise<shli_
         show_qnty,
         show_price,
         show_weight,
-        show_threestate,
+        show_state_unknown,
+        show_state_stop,
         persons_can_edit,
       },
       include: {

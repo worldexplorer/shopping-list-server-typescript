@@ -146,38 +146,39 @@ model shli_punit {
 }
 
 model shli_purchase {
-  id               Int            @id @default(autoincrement())
-  date_updated     DateTime       @default(now()) @db.Timestamp(6)
-  date_created     DateTime       @default(now()) @db.Timestamp(6)
-  date_published   DateTime?      @db.Timestamp(6)
-  published        Boolean        @default(true)
-  deleted          Boolean        @default(false)
-  manorder         Int            @default(autoincrement())
-  ident            String         @default("") @db.VarChar(250)
-  comment_above    String?
-  comment_below    String?
-  room             Int
-  message          Int
-  show_pgroup      Boolean        @default(false)
-  show_price       Boolean        @default(false)
-  show_qnty        Boolean        @default(false)
-  show_weight      Boolean        @default(false)
-  copiedfrom_id    Int?
-  person_created   Int
-  persons_can_edit Int[]
-  purchased        Boolean        @default(false)
-  person_purchased Int?
-  price_total      Decimal?       @db.Decimal(7, 2)
-  weight_total     Decimal?       @db.Decimal(7, 2)
-  show_serno       Boolean        @default(false)
-  show_threestate  Boolean        @default(false)
-  Person_created   shli_person    @relation("shli_personToshli_purchase_person_created", fields: [person_created], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  Person_purchased shli_person?   @relation("shli_personToshli_purchase_person_purchased", fields: [person_purchased], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  PurchaseRoom     shli_room      @relation("shli_purchase_roomToshli_room", fields: [room], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  Pgroups          shli_pgroup[]
-  Products         shli_product[]
-  Puritems         shli_puritem[]
-  shli_message     shli_message[]
+  id                 Int            @id @default(autoincrement())
+  date_updated       DateTime       @default(now()) @db.Timestamp(6)
+  date_created       DateTime       @default(now()) @db.Timestamp(6)
+  date_published     DateTime?      @db.Timestamp(6)
+  published          Boolean        @default(true)
+  deleted            Boolean        @default(false)
+  manorder           Int            @default(autoincrement())
+  ident              String         @default("") @db.VarChar(250)
+  comment_above      String?
+  comment_below      String?
+  room               Int
+  message            Int
+  show_pgroup        Boolean        @default(false)
+  show_price         Boolean        @default(false)
+  show_qnty          Boolean        @default(false)
+  show_weight        Boolean        @default(false)
+  copiedfrom_id      Int?
+  person_created     Int
+  persons_can_edit   Int[]
+  purchased          Boolean        @default(false)
+  person_purchased   Int?
+  price_total        Decimal?       @db.Decimal(7, 2)
+  weight_total       Decimal?       @db.Decimal(7, 2)
+  show_serno         Boolean        @default(false)
+  show_state_unknown Boolean        @default(false)
+  show_state_stop    Boolean        @default(false)
+  Person_created     shli_person    @relation("shli_personToshli_purchase_person_created", fields: [person_created], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Person_purchased   shli_person?   @relation("shli_personToshli_purchase_person_purchased", fields: [person_purchased], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  PurchaseRoom       shli_room      @relation("shli_purchase_roomToshli_room", fields: [room], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Pgroups            shli_pgroup[]
+  Products           shli_product[]
+  Puritems           shli_puritem[]
+  shli_message       shli_message[]
 }
 
 model shli_puritem {
@@ -194,11 +195,11 @@ model shli_puritem {
   pgroup         Int?
   product        Int?
   qnty           Decimal?      @db.Decimal(7, 2)
-  bought         Boolean?      @default(false)
   bought_qnty    Decimal?      @db.Decimal(7, 2)
   bought_price   Decimal?      @db.Decimal(7, 2)
   bought_weight  Decimal?      @db.Decimal(7, 2)
   comment        String?
+  bought         Int           @default(0) @db.SmallInt
   Pgroup         shli_pgroup?  @relation(fields: [pgroup], references: [id], onDelete: NoAction, onUpdate: NoAction)
   Product        shli_product? @relation(fields: [product], references: [id], onDelete: NoAction, onUpdate: NoAction)
   Purchase       shli_purchase @relation(fields: [purchase], references: [id], onDelete: NoAction, onUpdate: NoAction)

@@ -19,7 +19,7 @@ export type FillPurItemDto = {
   // room: number;
   // message: number;
 
-  bought: boolean | null;
+  bought: number;
   bought_qnty: number | null;
   bought_price: number | null;
   bought_weight: number | null;
@@ -28,7 +28,7 @@ export type FillPurItemDto = {
 
 type PurItemForComparison = {
   id: number;
-  bought: boolean | null;
+  bought: number;
   bought_qnty: Decimal | null;
   bought_price: Decimal | null;
   bought_weight: Decimal | null;
@@ -87,9 +87,9 @@ export async function fillPurchase(
       continue;
     }
 
-    // const changed = compare(purItem, sameInDb);
-    const changes1 = whatChanged2(purItem, sameInDb);
-    const changed = changes1.length > 0;
+    const changed = compare(purItem, sameInDb);
+    // const changes1 = whatChanged2(purItem, sameInDb);
+    // const changed = changes1.length > 0;
     if (!changed) {
       continue;
     }
@@ -137,7 +137,7 @@ export async function fillPurchase(
 
 function compare(purItem: FillPurItemDto, sameInDb: PurItemForComparison): boolean {
   let changed = false;
-  changed ||= purItem.bought !== sameInDb.bought;
+  changed ||= purItem.bought != sameInDb.bought;
   changed ||= purItem.bought_qnty !== decimalToNumber(sameInDb.bought_qnty);
   changed ||= purItem.bought_price !== decimalToNumber(sameInDb.bought_price);
   changed ||= purItem.bought_weight !== decimalToNumber(sameInDb.bought_weight);
@@ -148,7 +148,7 @@ function compare(purItem: FillPurItemDto, sameInDb: PurItemForComparison): boole
 function whatChanged2(beforeUpdate: FillPurItemDto, afterUpdate: PurItemForComparison): string {
   let ret = '';
 
-  if (beforeUpdate.bought !== afterUpdate.bought) {
+  if (beforeUpdate.bought != afterUpdate.bought) {
     ret += `bought[${beforeUpdate.bought}]=>[${afterUpdate.bought}] `;
   }
 
