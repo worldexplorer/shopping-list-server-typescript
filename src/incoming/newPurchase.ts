@@ -23,9 +23,10 @@ export type NewPurchaseDto = {
   message: number;
 
   show_pgroup: boolean;
-  show_price: boolean;
   show_qnty: boolean;
+  show_price: boolean;
   show_weight: boolean;
+  show_threestate: boolean;
 
   copiedfrom_id?: number;
   persons_can_edit: number[];
@@ -43,9 +44,10 @@ export async function newPurchase(
     name,
 
     show_pgroup,
-    show_price,
     show_qnty,
+    show_price,
     show_weight,
+    show_threestate,
 
     copiedfrom_id,
     persons_can_edit,
@@ -62,9 +64,10 @@ export async function newPurchase(
         ident: name,
 
         show_pgroup,
-        show_price,
         show_qnty,
+        show_price,
         show_weight,
+        show_threestate,
 
         copiedfrom_id,
         persons_can_edit,

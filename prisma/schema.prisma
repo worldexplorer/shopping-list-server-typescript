@@ -170,6 +170,7 @@ model shli_purchase {
   price_total      Decimal?       @db.Decimal(7, 2)
   weight_total     Decimal?       @db.Decimal(7, 2)
   show_serno       Boolean        @default(false)
+  show_threestate  Boolean        @default(false)
   Person_created   shli_person    @relation("shli_personToshli_purchase_person_created", fields: [person_created], references: [id], onDelete: NoAction, onUpdate: NoAction)
   Person_purchased shli_person?   @relation("shli_personToshli_purchase_person_purchased", fields: [person_purchased], references: [id], onDelete: NoAction, onUpdate: NoAction)
   PurchaseRoom     shli_room      @relation("shli_purchase_roomToshli_room", fields: [room], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -187,13 +188,13 @@ model shli_puritem {
   published      Boolean       @default(true)
   deleted        Boolean       @default(false)
   manorder       Int           @default(autoincrement())
-  ident          String        @default("") @db.VarChar(250)
+  ident          String        @default(dbgenerated("''::character varying"))
   room           Int
   purchase       Int
   pgroup         Int?
   product        Int?
   qnty           Decimal?      @db.Decimal(7, 2)
-  bought         Boolean       @default(false)
+  bought         Boolean?      @default(false)
   bought_qnty    Decimal?      @db.Decimal(7, 2)
   bought_price   Decimal?      @db.Decimal(7, 2)
   bought_weight  Decimal?      @db.Decimal(7, 2)

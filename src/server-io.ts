@@ -29,6 +29,16 @@ import { EditPurchaseDto, editPurchase } from './incoming/editPurchase';
 import { shli_message, shli_purchase } from '@prisma/client';
 import { fillPurchase, FillPurchaseDto } from './incoming/fillPurchase';
 
+// https://www.npmjs.com/package/prettyjson
+var prettyjson = require('prettyjson');
+// const prettyJsonOptions = {
+//   keysColor: 'rainbow',
+//   dashColor: 'magenta',
+//   stringColor: 'white',
+//   multilineStringColor: 'cyan',
+// };
+const prettyJsonOptions = {};
+
 type SocketUserRoom = {
   socketId: string;
   userId: number;
@@ -219,7 +229,9 @@ export function create(httpServer: http.Server) {
         console.log(
           '   << MESSAGES/purchase: ',
           //  messagesDto.messages.length
-          messagesDto.messages.map(x => JSON.stringify(x.purchase))
+          messagesDto.messages.map(x =>
+            prettyjson.render(JSON.stringify(x.purchase, null, 2), prettyJsonOptions)
+          )
         );
         socket.emit('messages', messagesDto);
       } catch (e) {

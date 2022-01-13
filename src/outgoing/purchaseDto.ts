@@ -16,6 +16,7 @@ export type PurchaseDto = {
   show_qnty: boolean;
   show_price: boolean;
   show_weight: boolean;
+  show_threestate: boolean;
 
   copiedfrom_id?: number;
 
@@ -42,7 +43,7 @@ export type PuritemDto = {
   name: string;
   qnty?: number;
 
-  bought: boolean;
+  bought?: boolean;
   bought_qnty?: number;
   bought_price?: number;
   bought_weight?: number;
@@ -126,6 +127,7 @@ export function purchaseDaoToDto(
     show_qnty: purDao.show_qnty,
     show_price: purDao.show_price,
     show_weight: purDao.show_weight,
+    show_threestate: purDao.show_threestate,
 
     person_created: purDao.person_created,
     person_created_name: purDao.Person_created.ident,
@@ -147,7 +149,7 @@ function puritemDaoToDto(x: PuritemDao): PuritemDto {
     id: x.id,
     name: x.ident,
     qnty: x.qnty?.toNumber() || undefined,
-    bought: x.bought,
+    bought: x.bought == null ? undefined : x.bought,
     bought_qnty: x.bought_qnty?.toNumber() || undefined,
     bought_price: x.bought_price?.toNumber() || undefined,
     bought_weight: x.bought_weight?.toNumber() || undefined,
