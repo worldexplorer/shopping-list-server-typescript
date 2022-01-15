@@ -244,13 +244,11 @@ export async function editPurchase(editPurchase: EditPurchaseDto): Promise<shli_
     var pgroup_id: number | null = purItem.pgroup_id ?? null;
     var product_id: number | null = purItem.product_id ?? null;
 
-    if (purchaseEdited.show_pgroup) {
-      if (pgroup_id != null && pgroup_id <= -1) {
-        pgroup_id = null;
-      }
-      if (product_id != null && product_id <= -1) {
-        product_id = null;
-      }
+    if (pgroup_id != null && pgroup_id <= -1) {
+      pgroup_id = null;
+    }
+    if (product_id != null && product_id <= -1) {
+      product_id = null;
     }
 
     await prI.shli_puritem
