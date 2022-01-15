@@ -73,35 +73,35 @@ export async function editPurchase(editPurchase: EditPurchaseDto): Promise<shli_
       throw `${reason} ${msig}`;
     });
 
-  if (purchaseEdited.show_pgroup) {
-    const negativePgroupsToReplace = new Map<number, number>();
+  const negativePgroupsToReplace = new Map<number, number>();
 
-    for (let i = 0; i < purItems.length; i++) {
-      const purItem: PurItemDto = purItems[i];
+  for (let i = 0; i < purItems.length; i++) {
+    const purItem: PurItemDto = purItems[i];
 
-      const pgroup_id: number | undefined = purItem.pgroup_id;
-      const pgroup_ident: string | undefined = purItem.pgroup_name;
-      const product_id: number | undefined = purItem.product_id;
-      const product_ident: string | undefined = purItem.product_name;
+    const pgroup_id: number | undefined = purItem.pgroup_id;
+    const pgroup_ident: string = purItem.pgroup_name || '';
+    const product_id: number | undefined = purItem.product_id;
+    const product_ident: string = purItem.product_name || '';
 
-      var pgroupLog = `pgroupName[${pgroup_ident}]id[${pgroup_id}]`;
-      if (pgroup_id) {
-        if (pgroup_id < 0 && !negativePgroupsToReplace.has(pgroup_id)) {
-          const sameIdentPgroups = await prI.shli_pgroup
-            .findMany({
-              where: { ident: pgroup_ident },
-            })
-            .catch(reason => {
-              throw `${reason} ${msig} ${pgroupLog}`;
-            });
+    var pgroupLog = `pgroupName[${pgroup_ident}]id[${pgroup_id}]`;
+    if (pgroup_id) {
+      if (pgroup_id < 0 && !negativePgroupsToReplace.has(pgroup_id)) {
+        const sameIdentPgroups = await prI.shli_pgroup
+          .findMany({
+            where: { ident: pgroup_ident },
+          })
+          .catch(reason => {
+            throw `${reason} ${msig} ${pgroupLog}`;
+          });
 
-          if (sameIdentPgroups.length > 0) {
-            const firstFound = sameIdentPgroups[0];
-            pgroupLog += `=>id[${firstFound.id}]`;
-            console.log(`        firstFound ${pgroupLog}`);
-            negativePgroupsToReplace.set(pgroup_id, firstFound.id);
-            purItem.pgroup_id = firstFound.id;
-          } else {
+        if (sameIdentPgroups.length > 0) {
+          const firstFound = sameIdentPgroups[0];
+          pgroupLog += `=>id[${firstFound.id}]`;
+          console.log(`        firstFound ${pgroupLog}`);
+          negativePgroupsToReplace.set(pgroup_id, firstFound.id);
+          purItem.pgroup_id = firstFound.id;
+        } else {
+          if (purchaseEdited.show_pgroup) {
             const newPgroup = await prI.shli_pgroup
               .create({
                 data: {
@@ -116,25 +116,27 @@ export async function editPurchase(editPurchase: EditPurchaseDto): Promise<shli_
               });
 
             pgroupLog += `=>id[${newPgroup.id}]`;
-            console.log(`        inserted ${pgroupLog}`);
+            console.log(`        inserted shli_pgroup ${pgroupLog}`);
             negativePgroupsToReplace.set(pgroup_id, newPgroup.id);
             purItem.pgroup_id = newPgroup.id;
           }
-        } else {
-          const oldPgroup = await prI.shli_pgroup
-            .findUnique({
-              where: { id: pgroup_id },
-            })
-            .catch(reason => {
-              throw `${reason} ${msig} ${pgroupLog}`;
-            });
+        }
+      } else {
+        const oldPgroup = await prI.shli_pgroup
+          .findUnique({
+            where: { id: pgroup_id },
+          })
+          .catch(reason => {
+            throw `${reason} ${msig} ${pgroupLog}`;
+          });
 
-          if (oldPgroup != null) {
-            var changed = '';
-            if (oldPgroup.ident != pgroup_ident) {
-              changed += `ident[${oldPgroup.ident}]=>[${pgroup_ident}]`;
-            }
-            if (changed.length > 0) {
+        if (oldPgroup != null) {
+          var changed = '';
+          if (oldPgroup.ident != pgroup_ident) {
+            changed += `ident[${oldPgroup.ident}]=>[${pgroup_ident}]`;
+          }
+          if (changed.length > 0) {
+            if (purchaseEdited.show_pgroup) {
               const updatedPgroup = await prI.shli_pgroup
                 .update({
                   data: { ident: pgroup_ident },
@@ -144,32 +146,35 @@ export async function editPurchase(editPurchase: EditPurchaseDto): Promise<shli_
                   throw `${reason} ${msig} ${pgroupLog}`;
                 });
 
-              pgroupLog += `=>ident[${updatedPgroup.ident}]`;
-              console.log(`        updated ${pgroupLog}`);
+              pgroupLog += `=>ident[${updatedPgroup.ident}] because ${changed} changed`;
+              console.log(`        updated shli_pgroup ${pgroupLog}`);
             }
           }
         }
+      }
 
-        var existingOrCreatedPgroupId =
-          pgroup_id > 0 ? pgroup_id : negativePgroupsToReplace.get(pgroup_id);
-        pgroupLog += `=>exId[${existingOrCreatedPgroupId}]`;
-        if (product_id && existingOrCreatedPgroupId) {
-          var productLog = `${pgroupLog} productName[${product_ident}]id[${product_id}]`;
-          if (product_id < 0) {
-            const sameIdentProducts = await prI.shli_product
-              .findMany({
-                where: { ident: product_ident },
-              })
-              .catch(reason => {
-                throw `${reason} ${msig} ${productLog}`;
-              });
+      var existingOrCreatedPgroupId =
+        pgroup_id > 0 ? pgroup_id : negativePgroupsToReplace.get(pgroup_id);
+      pgroupLog += `=>existingPgroupId[${existingOrCreatedPgroupId}]`;
+      if (product_id && existingOrCreatedPgroupId) {
+        var productLog = `${pgroupLog} productName[${product_ident}]id[${product_id}]`;
+        if (product_id < 0) {
+          const sameIdentProducts = await prI.shli_product
+            .findMany({
+              where: { ident: product_ident },
+            })
+            .catch(reason => {
+              throw `${reason} ${msig} ${productLog}`;
+            });
 
-            if (sameIdentProducts.length > 0) {
-              const firstFound = sameIdentProducts[0];
-              productLog += `=>id[${firstFound.id}]`;
-              console.log(`        firstFound ${productLog}`);
-              purItem.product_id = firstFound.id;
-            } else {
+          if (sameIdentProducts.length > 0) {
+            const firstFound = sameIdentProducts[0];
+            productLog += `=>id[${firstFound.id}]`;
+            console.log(`        firstFound ${productLog}`);
+            purItem.product_id = firstFound.id;
+            purItem.pgroup_id = firstFound.pgroup ?? purItem.pgroup_id;
+          } else {
+            if (purchaseEdited.show_pgroup) {
               const newProduct = await prI.shli_product
                 .create({
                   data: {
@@ -184,30 +189,32 @@ export async function editPurchase(editPurchase: EditPurchaseDto): Promise<shli_
                 });
 
               productLog += `=>id[${newProduct.id}]`;
-              console.log(`        inserted ${productLog}`);
+              console.log(`        inserted shli_product ${productLog}`);
               purItem.product_id = newProduct.id;
             }
-            if (pgroup_id < 0) {
-              purItem.pgroup_id = existingOrCreatedPgroupId;
-            }
-          } else {
-            const oldProduct = await prI.shli_product
-              .findUnique({
-                where: { id: product_id },
-              })
-              .catch(reason => {
-                throw `${reason} ${msig} ${productLog}`;
-              });
+          }
+          if (pgroup_id < 0) {
+            purItem.pgroup_id = existingOrCreatedPgroupId;
+          }
+        } else {
+          const oldProduct = await prI.shli_product
+            .findUnique({
+              where: { id: product_id },
+            })
+            .catch(reason => {
+              throw `${reason} ${msig} ${productLog}`;
+            });
 
-            if (oldProduct != null) {
-              var changed = '';
-              if (oldProduct.ident != product_ident) {
-                changed += `ident[${oldProduct.ident}]=>[${product_ident}] `;
-              }
-              if (oldProduct.pgroup != existingOrCreatedPgroupId) {
-                changed += `pgroup[${oldProduct.pgroup}]=>[${existingOrCreatedPgroupId}](${pgroup_id})) `;
-              }
-              if (changed.length > 0) {
+          if (oldProduct != null) {
+            var changed = '';
+            if (oldProduct.ident != product_ident) {
+              changed += `ident[${oldProduct.ident}]=>[${product_ident}] `;
+            }
+            if (oldProduct.pgroup != existingOrCreatedPgroupId) {
+              changed += `pgroup[${oldProduct.pgroup}]=>[${existingOrCreatedPgroupId}](${pgroup_id})) `;
+            }
+            if (changed.length > 0) {
+              if (purchaseEdited.show_pgroup) {
                 const updatedProduct = await prI.shli_product
                   .update({
                     data: { ident: product_ident, pgroup: existingOrCreatedPgroupId },
@@ -217,12 +224,12 @@ export async function editPurchase(editPurchase: EditPurchaseDto): Promise<shli_
                     throw `${reason} ${msig} ${productLog}`;
                   });
 
-                productLog += `=>ident[${updatedProduct.ident}]`;
-                console.log(`        updated ${productLog}`);
+                productLog += `=>ident[${updatedProduct.ident}] because ${changed} changed`;
+                console.log(`        updated shli_product ${productLog}`);
               }
-              if (oldProduct.pgroup != existingOrCreatedPgroupId) {
-                purItem.pgroup_id = existingOrCreatedPgroupId;
-              }
+            }
+            if (oldProduct.pgroup != existingOrCreatedPgroupId) {
+              purItem.pgroup_id = existingOrCreatedPgroupId;
             }
           }
         }
@@ -234,11 +241,17 @@ export async function editPurchase(editPurchase: EditPurchaseDto): Promise<shli_
     const purItem: PurItemDto = purItems[i];
     const purItemId = purItem.id == 0 ? undefined : purItem.id;
 
-    const pgroup_id: number | null = purchaseEdited.show_pgroup ? purItem.pgroup_id ?? null : null;
+    var pgroup_id: number | null = purItem.pgroup_id ?? null;
+    var product_id: number | null = purItem.product_id ?? null;
 
-    const product_id: number | null = purchaseEdited.show_pgroup
-      ? purItem.product_id ?? null
-      : null;
+    if (purchaseEdited.show_pgroup) {
+      if (pgroup_id != null && pgroup_id <= -1) {
+        pgroup_id = null;
+      }
+      if (product_id != null && product_id <= -1) {
+        product_id = null;
+      }
+    }
 
     await prI.shli_puritem
       .upsert({
@@ -274,18 +287,18 @@ export async function editPurchase(editPurchase: EditPurchaseDto): Promise<shli_
   const fromApp = purItems.map(x => x.id);
   const purItemsToDelete = calcIdsMissingAmongSubmitted(inDatabase, fromApp);
   if (purItemsToDelete.length > 0) {
-    const msig = `purItems.deleteMany(${purItemsToDelete.join(',')})`;
+    const msig = `        purItems.deleteManyIds(${purItemsToDelete.join(',')})`;
     console.log(msig);
 
-    // await prI.shli_puritem
-    //   .deleteMany({
-    //     where: {
-    //       id: { in: purItemsToDelete },
-    //     },
-    //   })
-    //   .catch(reason => {
-    //     throw `${reason} //${msig}`;
-    //   });
+    await prI.shli_puritem
+      .deleteMany({
+        where: {
+          id: { in: purItemsToDelete },
+        },
+      })
+      .catch(reason => {
+        throw `${reason} //${msig}`;
+      });
   }
 
   const messageEdited: shli_message = await updateMessageSetEditedTrue(purchaseEdited.message);
@@ -300,7 +313,7 @@ function calcIdsMissingAmongSubmitted(inDatabase: number[], submittedFromApp: nu
     if (positionFound === -1) {
       continue; // found only in toDelete; will stay in toDelete[] => will be deleted
     }
-    toDelete = toDelete.splice(positionFound, 1);
+    toDelete.splice(positionFound, 1);
   }
   return toDelete; // only ids missing in submittedFromApp[]
 }

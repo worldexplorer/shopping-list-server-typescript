@@ -230,7 +230,8 @@ export function create(httpServer: http.Server) {
           '   << MESSAGES/purchase: ',
           //  messagesDto.messages.length
           messagesDto.messages.map(x =>
-            prettyjson.render(JSON.stringify(x.purchase, null, 2), prettyJsonOptions)
+            // prettyjson.render(JSON.stringify(x.purchase, null, 2), prettyJsonOptions)
+            JSON.stringify(x.purchase)
           )
         );
         socket.emit('messages', messagesDto);
@@ -291,7 +292,7 @@ export function create(httpServer: http.Server) {
     });
 
     socket.on('editPurchase', async (json: EditPurchaseDto) => {
-      console.log('> EDIT_PURCHASE', json);
+      console.log('> EDIT_PURCHASE'); //json);
       try {
         const [userId] = await canUserEdit(
           `editPurchase()`,
@@ -301,7 +302,7 @@ export function create(httpServer: http.Server) {
           json.id
         );
 
-        console.log(`    1/3 updating purchase`, json);
+        console.log(`    1/3 updating purchase`); //, json);
         const purchaseEdited: shli_purchase = await editPurchase(json);
 
         console.log(`    2/3 updating message[${json.message}].edited=true`);
@@ -311,8 +312,8 @@ export function create(httpServer: http.Server) {
         const messageWithPurchaseEdited: MessageDto = await selectMessage(json.message);
 
         console.log(
-          `   << MESSAGE/purchaseEdited[${purchaseEdited.id}]:messageIdUpdated[${messageEdited.id}]`,
-          messageWithPurchaseEdited.purchase
+          `   << MESSAGE/purchaseEdited[${purchaseEdited.id}]:messageIdUpdated[${messageEdited.id}]`
+          // , messageWithPurchaseEdited.purchase
         );
         ioServer.emit('message', messageWithPurchaseEdited);
       } catch (e) {
