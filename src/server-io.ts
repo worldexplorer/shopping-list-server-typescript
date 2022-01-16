@@ -16,6 +16,7 @@ import {
   markMessagesRead,
   MarkMessagesReadDto,
   UpdatedMessageReadDto,
+  UpdatedMessagesReadDto,
 } from './incoming/markMessagesRead';
 import { DeletedMessagesDto, deleteMessages, DeleteMessagesDto } from './incoming/deleteMessages';
 import {
@@ -25,9 +26,10 @@ import {
 } from './incoming/archiveMessages';
 import { updateMessageIdInPurchase, newPurchase, NewPurchaseDto } from './incoming/newPurchase';
 import { RoomsDto } from './outgoing/roomsDto';
-import { EditPurchaseDto, editPurchase } from './incoming/editPurchase';
+import { editPurchase } from './incoming/editPurchase';
 import { shli_message, shli_purchase } from '@prisma/client';
 import { fillPurchase, FillPurchaseDto } from './incoming/fillPurchase';
+import { EditPurchaseDto } from './outgoing/purchaseDto';
 
 // https://www.npmjs.com/package/prettyjson
 var prettyjson = require('prettyjson');
@@ -176,8 +178,8 @@ export function create(httpServer: http.Server) {
     socket.on('markMessagesRead', async (json: MarkMessagesReadDto) => {
       console.log('> MARK_MESSAGES_READ', json);
       try {
-        const messagesMarkedRead: UpdatedMessageReadDto[] = await markMessagesRead(json);
-        if (messagesMarkedRead.length > 0) {
+        const messagesMarkedRead: UpdatedMessagesReadDto = await markMessagesRead(json);
+        if (messagesMarkedRead.messagesUpdated.length > 0) {
           console.log('   << UPDATED_MESSAGES_READ', JSON.stringify(messagesMarkedRead));
           ioServer.emit('updatedMessagesRead', messagesMarkedRead);
         } else {

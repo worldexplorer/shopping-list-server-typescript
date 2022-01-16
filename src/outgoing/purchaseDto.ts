@@ -1,81 +1,63 @@
 import { dateShift } from '../utils/conversion.tz';
 import { shli_message, shli_purchase, shli_puritem } from '@prisma/client';
 import { MessageDto } from './messageDto';
+import { NewPurItemDto as NewPurItemDto } from '../incoming/newPurchase';
 
-export type PurchaseDto = {
-  id: number;
-  date_created: Date;
-  date_updated: Date;
+// base for NewPurchaseDto , EditPurchaseDto; FillPurchaseDto is out of inheritance
+export type BasePurchaseDto = {
   name: string;
 
-  message: number;
   room: number;
+  message: number;
 
   show_pgroup: boolean;
   show_serno: boolean;
-  show_qnty: boolean;
   show_price: boolean;
+  show_qnty: boolean;
   show_weight: boolean;
   show_state_unknown: boolean;
   show_state_stop: boolean;
 
+  persons_can_edit: number[];
+};
+
+export type EditPurchaseDto = BasePurchaseDto & {
+  id: number;
+  purItems: PurItemDto[];
+};
+
+export type PurchaseDto = EditPurchaseDto & {
+  date_created: Date;
+  date_updated: Date;
+
+  replyto_id?: number; // goes to newMessage.replyto_id?
   copiedfrom_id?: number;
 
   person_created: number;
   person_created_name: string;
-  persons_can_edit: number[];
 
   purchased: boolean;
   person_purchased?: number;
   person_purchased_name?: string;
+
   price_total?: number;
   weight_total?: number;
-
-  purItems: PuritemDto[];
 };
 
-export type PuritemDto = {
+export type PurItemDto = NewPurItemDto & {
   id: number;
-  // date_updated: Date;
-  // date_created: Date;
-  // published: number;
-  // deleted: number;
-  // manorder: number;
-  name: string;
-  qnty?: number;
 
   bought: number;
   bought_qnty?: number;
   bought_price?: number;
   bought_weight?: number;
 
-  comment?: string;
-  // Pgroup: PGroup;
-  // Product: Product;
-  pgroup_id?: number;
-  pgroup_name?: string;
-  product_id?: number;
-  product_name?: string;
-  punit_id?: number;
-  punit_name?: string;
-  punit_brief?: string;
-  punit_fpoint?: boolean;
+  // date_updated: Date;
+  // date_created: Date;
+  // published: number;
+  // deleted: number;
+  // manorder: number;
 };
-
-// export type PGroup = {
-//   id: number;
-//   ident: String;
-// };
-
-// export type Product = {
-//   id: number;
-//   ident: String;
-// };
-
-// export type PUnit = {
-//   id: number;
-//   ident: String;
-// };
 
 export type PurchaseDao = shli_purchase & {
   Person_created: {
@@ -146,7 +128,7 @@ export function purchaseDaoToDto(
   return ret;
 }
 
-function puritemDaoToDto(x: PuritemDao): PuritemDto {
+function puritemDaoToDto(x: PuritemDao): PurItemDto {
   return {
     id: x.id,
     name: x.ident,

@@ -11,9 +11,13 @@ export type UpdatedMessageReadDto = {
   persons_read: number[];
 };
 
+export type UpdatedMessagesReadDto = {
+  messagesUpdated: UpdatedMessageReadDto[];
+};
+
 export async function markMessagesRead(
   readMsg: MarkMessagesReadDto
-): Promise<UpdatedMessageReadDto[]> {
+): Promise<UpdatedMessagesReadDto> {
   const { messageIds, user } = readMsg;
   const msig = `markMessageRead(messageIds[${messageIds.join(',')}] byUser[${user}]):`;
 
@@ -28,7 +32,7 @@ export async function markMessagesRead(
     )}`;
   }
 
-  const ret: UpdatedMessageReadDto[] = [];
+  const messagesUpdated: UpdatedMessageReadDto[] = [];
   for (var messageToMarkRead of messagesToMarkReadByOneUser) {
     const newPersonsRead = messageToMarkRead.persons_read;
     if (newPersonsRead.find(x => x === user)) {
@@ -58,7 +62,9 @@ export async function markMessagesRead(
       id: afterUpdate.id,
       persons_read: afterUpdate.persons_read,
     };
-    ret.push(msgUpdated);
+    messagesUpdated.push(msgUpdated);
   }
+
+  const ret: UpdatedMessagesReadDto = { messagesUpdated };
   return ret;
 }
